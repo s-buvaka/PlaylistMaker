@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:background="#3772E7"
-    android:paddingVertical="16dp"
+    android:padding="16dp"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -22,8 +22,8 @@
 
     <Button
         android:id="@+id/button_bigOne"
-        android:layout_width="328dp"
-        android:layout_height="220dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="40dp"
         android:backgroundTint="@color/main_button"
         android:layout_weight="1"
@@ -40,8 +40,8 @@
 
     <Button
         android:id="@+id/button_bigTwo"
-        android:layout_width="328dp"
-        android:layout_height="220dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
 
         android:backgroundTint="@color/main_button"
         android:layout_weight="1"
@@ -58,9 +58,8 @@
 
     <Button
         android:id="@+id/button_bigThree"
-        android:layout_width="328dp"
-        android:layout_height="220dp"
-
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:backgroundTint="@color/main_button"
         android:layout_weight="1"
         app:cornerRadius="@dimen/cornerRadius"
