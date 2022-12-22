@@ -1,0 +1,18 @@
+[33mcommit 3e4dfbba113b26612fb4e948fe93cb8afe52f7dc[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Титан ПК <decardcain21@gmail.com>
+Date:   Sat Nov 5 11:51:11 2022 +0300
+
+    Исправил activity_main.xml, убрал лишнюю строку в button_big.xml
+
+[33mcommit a0a6e4e8c115a0126830dd712c77acfafa8689ec[m
+Author: Титан ПК <decardcain21@gmail.com>
+Date:   Wed Nov 2 00:22:37 2022 +0300
+
+    Полетела студия, надеюсь всё работает...аминь!)
+    Версия main.xml через constraint,не уверен как правильнее
+
+[33mcommit 0118ce4e934c19b11da80d116f5de0b80dea2eb0[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: Титан ПК <decardcain21@gmail.com>
+Date:   Tue Nov 1 15:52:34 2022 +0300
+
+    Initial commit
