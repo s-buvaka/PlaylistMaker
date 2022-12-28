@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.PlaylistMaker2Settings"
+    android:theme="@style/Theme.PlaylistMaker2"
     tools:context=".SearchActivity">
 
     <View
@@ -35,8 +35,8 @@
         android:layout_marginEnd="16dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:background="@drawable/ll_search"
         android:layout_marginTop="24dp"
+        android:background="@drawable/ll_search"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/back"
         >
@@ -58,8 +58,8 @@
             android:hint="Поиск"
             android:textSize="16sp"
             android:background="@null"
-            style="@style/activity_search_et_text"
-            android:layout_gravity="bottom"/>
+            android:layout_gravity="bottom"
+            style="@style/activity_search_et"/>
 
         <ImageButton
             android:id="@+id/buttonClear"

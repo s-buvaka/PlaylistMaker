@@ -2,13 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:padding="16dp"
-    android:orientation="vertical"
-    android:theme="@style/Theme.PlaylistMaker2"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    style="@style/activity_main_ll">
 
     <TextView
         android:id="@+id/title"
@@ -23,35 +18,20 @@
 
     <Button
         android:id="@+id/button_bigOne"
-        app:cornerRadius="@dimen/cornerRadius"
         android:text="@string/search_name"
         app:icon="@drawable/ic_search"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:iconSize="17dp"
-        app:iconTint="@color/main_text"
         style="@style/main_buttonstyle" />
 
     <Button
         android:id="@+id/button_bigTwo"
-        app:cornerRadius="@dimen/cornerRadius"
         android:text="@string/medialibrary_name"
         app:icon="@drawable/ic_medialibrary"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:iconSize="17dp"
-        app:iconTint="@color/main_text"
         style="@style/main_buttonstyle"/>
 
     <Button
         android:id="@+id/button_bigThree"
-        app:cornerRadius="@dimen/cornerRadius"
         android:text="@string/settings_name"
         app:icon="@drawable/ic_settings"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:iconSize="17dp"
-        app:iconTint="@color/main_text"
         style="@style/main_buttonstyle"/>
 
 

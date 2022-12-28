@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 
@@ -25,6 +25,7 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
         val editText = findViewById<EditText>(R.id.editText)
+        val buttonBack = findViewById<View>(R.id.back)
         val buttonClear: ImageButton = findViewById(R.id.buttonClear)
         if (savedInstanceState != null) {
             editText.setText(saveEditText)
@@ -48,8 +49,13 @@ class SearchActivity : AppCompatActivity() {
         }
         editText.addTextChangedListener(simpletextWatcher)
 
+        buttonBack.setOnClickListener {
+            onBackPressed()
+        }
+
         buttonClear.setOnClickListener{
             editText.requestFocus()
+            editText.setText("")
             (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(editText.windowToken, 0)
         }
 
