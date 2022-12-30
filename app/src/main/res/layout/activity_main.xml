@@ -19,18 +19,21 @@
     <Button
         android:id="@+id/button_bigOne"
         android:text="@string/search_name"
+        android:layout_marginTop="56dp"
         app:icon="@drawable/ic_search"
         style="@style/main_buttonstyle" />
 
     <Button
         android:id="@+id/button_bigTwo"
         android:text="@string/medialibrary_name"
+        android:layout_marginTop="@dimen/button_main_marginTop"
         app:icon="@drawable/ic_medialibrary"
         style="@style/main_buttonstyle"/>
 
     <Button
         android:id="@+id/button_bigThree"
         android:text="@string/settings_name"
+        android:layout_marginTop="@dimen/button_main_marginTop"
         app:icon="@drawable/ic_settings"
         style="@style/main_buttonstyle"/>
 

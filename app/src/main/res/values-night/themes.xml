@@ -29,6 +29,10 @@
     </style>
 
     <style name="activity_settings_viewback">
+        <item name="android:layout_width">@dimen/icon_back_size</item>
+        <item name="android:layout_height">@dimen/icon_back_size</item>
+        <item name="android:layout_marginStart">@dimen/icon_back_size</item>
+        <item name="android:layout_marginTop">@dimen/icon_back_size</item>
         <item name="android:background">@drawable/ic_baseline_arrow_back_24_night</item>
     </style>
 

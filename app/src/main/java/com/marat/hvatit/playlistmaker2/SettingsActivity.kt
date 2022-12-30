@@ -26,10 +26,6 @@ class SettingsActivity : AppCompatActivity() {
         val buttonSupport = findViewById<LinearLayout>(R.id.llthree)
         val buttonUserAgreement = findViewById<LinearLayout>(R.id.llfour)
 
-
-
-
-
         buttonShare.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 createIntent(ActionFilter.SHARE)
@@ -51,8 +47,6 @@ class SettingsActivity : AppCompatActivity() {
         buttonBack.setOnClickListener {
             onBackPressed()
         }
-
-
 
         val sharedPreference =  getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
         var editor = sharedPreference.edit()
@@ -87,19 +81,19 @@ class SettingsActivity : AppCompatActivity() {
         val shareIntent: Intent
         when (action) {
             ActionFilter.SHARE -> {
-                val message = "https://practicum.yandex.ru/android-developer/"
+                val textshare = this.getString(R.string.text_share)
                 shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    putExtra(Intent.EXTRA_TEXT, message)
+                    putExtra(Intent.EXTRA_TEXT, textshare)
                     type = "text/plain"
                 }
                 startActivity(shareIntent)
             }
             ActionFilter.SUPPORT -> {
-                val tittleSend = "Сообщение разработчикам и разработчицам приложения Playlist Maker"
-                val textSend = "Спасибо разработчикам и разработчицам за крутое приложение!"
+                val tittleSend = this.getString(R.string.tittle_Send)
+                val textSend = this.getString(R.string.text_Send)
                 shareIntent = Intent(Intent.ACTION_SENDTO).apply {
                     data = Uri.parse("mailto:")
-                    putExtra(Intent.EXTRA_EMAIL, arrayOf("decardcain21@gmail.com"))
+                    putExtra(Intent.EXTRA_EMAIL, R.string.my_email)
                     putExtra(Intent.EXTRA_SUBJECT, tittleSend)
                     putExtra(Intent.EXTRA_TEXT, textSend)
 
@@ -107,8 +101,8 @@ class SettingsActivity : AppCompatActivity() {
                 startActivity(shareIntent)
             }
             ActionFilter.USERAGREEMENT -> {
-                val adress = "https://yandex.ru/legal/practicum_offer/"
-                shareIntent = Intent(Intent.ACTION_VIEW,Uri.parse(adress))
+                val textuseragreement = this.getString(R.string.text_useragreement)
+                shareIntent = Intent(Intent.ACTION_VIEW,Uri.parse(textuseragreement))
                 startActivity(shareIntent)
             }
         }

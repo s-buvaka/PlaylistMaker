@@ -3,5 +3,8 @@
     <dimen name="text_size">22sp</dimen>
     <dimen name="secondarytext_size">16sp</dimen>
     <dimen name="cornerRadius">16dp</dimen>
+    <dimen name="button_main_marginTop">16dp</dimen>
+    <dimen name="activity_settings_llheight">61dp</dimen>
+    <dimen name="icon_back_size">20dp</dimen>
 
 </resources>
