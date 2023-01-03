@@ -20,7 +20,7 @@
         <item name="android:textColor">#000000</item>
     </style>
 
-    <style name="main_buttonstyle">
+    <style name="Widget.MaterialComponents.Button.UnelevatedButton.main_buttonstyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
@@ -35,6 +35,13 @@
         <item name="cornerRadius">@dimen/cornerRadius</item>
     </style>
 
+
+    <style name="setings_activity_llbutton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/activity_settings_llheight</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?selectableItemBackground</item>
+    </style>
 
 
 </resources>

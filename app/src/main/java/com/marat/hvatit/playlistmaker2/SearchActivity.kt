@@ -1,6 +1,7 @@
 package com.marat.hvatit.playlistmaker2
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,10 +15,17 @@ import androidx.appcompat.app.AppCompatActivity
 
 class SearchActivity : AppCompatActivity() {
 
-    private var saveEditText: String? = "????"
+     private var saveEditText: String? = "error"
 
     companion object {
         const val EDITTEXT_TEXT = "EDITTEXT_TEXT"
+        private const val TAG = "SearchActivity"
+
+        fun getIntent(context:Context, message: String): Intent {
+            return Intent(context,SearchActivity::class.java).apply {
+                putExtra(TAG,message)
+            }
+        }
     }
 
 

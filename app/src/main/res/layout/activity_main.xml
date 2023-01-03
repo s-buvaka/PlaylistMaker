@@ -9,7 +9,6 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="14dp"
         android:layout_gravity="start"
         android:text="@string/title_appname"
@@ -21,21 +20,21 @@
         android:text="@string/search_name"
         android:layout_marginTop="56dp"
         app:icon="@drawable/ic_search"
-        style="@style/main_buttonstyle" />
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton.main_buttonstyle" />
 
     <Button
         android:id="@+id/button_bigTwo"
         android:text="@string/medialibrary_name"
         android:layout_marginTop="@dimen/button_main_marginTop"
         app:icon="@drawable/ic_medialibrary"
-        style="@style/main_buttonstyle"/>
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton.main_buttonstyle"/>
 
     <Button
         android:id="@+id/button_bigThree"
         android:text="@string/settings_name"
         android:layout_marginTop="@dimen/button_main_marginTop"
         app:icon="@drawable/ic_settings"
-        style="@style/main_buttonstyle"/>
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton.main_buttonstyle"/>
 
 
 </LinearLayout>

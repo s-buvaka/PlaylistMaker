@@ -13,5 +13,7 @@
     <string name="text_share">https://practicum.yandex.ru/android-developer/</string>
     <string name="text_useragreement">https://yandex.ru/legal/practicum_offer/</string>
     <string name="my_email">decardcain21@gmail.com</string>
+    <string name="main_messege">Android - это круто!</string>
+    <string name="error">error</string>
 
 </resources>

@@ -8,12 +8,21 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SwitchCompat
 
 class SettingsActivity : AppCompatActivity() {
 
     companion object {
-        const val PREFERENCE_NAME = "PREFERENCE_NAME"
-        const val PREFERENCE_VALUE = "value"
+
+        private const val PREFERENCE_NAME = "PREFERENCE_NAME"
+        private const val PREFERENCE_VALUE = "value"
+        private const val TAG = "SettingsActivity"
+
+        fun getIntent(context:Context, message: String): Intent {
+            return Intent(context,SettingsActivity::class.java).apply {
+                putExtra(TAG,message)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +30,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         val buttonBack = findViewById<View>(R.id.back)
-        val buttonSwitch = findViewById<Switch>(R.id.bswitch)
+        val buttonSwitch = findViewById<SwitchCompat>(R.id.bswitch)
         val buttonShare = findViewById<LinearLayout>(R.id.lltwo)
         val buttonSupport = findViewById<LinearLayout>(R.id.llthree)
         val buttonUserAgreement = findViewById<LinearLayout>(R.id.llfour)
@@ -59,6 +68,7 @@ class SettingsActivity : AppCompatActivity() {
                         editor.putBoolean(PREFERENCE_VALUE,isChecked)
                         editor.apply()
                         AppCompatDelegate.MODE_NIGHT_YES
+
                     }
                     else{
                         editor.putBoolean(PREFERENCE_VALUE,isChecked)

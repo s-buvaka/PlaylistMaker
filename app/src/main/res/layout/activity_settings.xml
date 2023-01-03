@@ -40,17 +40,17 @@
                 style="@style/settings_activity_viewtextstyle"
                 android:text="@string/darktheme_name" />
 
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/bswitch"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:switchMinWidth="32dp"
+                />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/lltwo"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/activity_settings_llheight"
-            android:gravity="center">
+            style="@style/setings_activity_llbutton">
 
             <TextView
                 style="@style/settings_activity_viewtextstyle"
@@ -66,9 +66,7 @@
 
         <LinearLayout
             android:id="@+id/llthree"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/activity_settings_llheight"
-            android:gravity="center">
+            style="@style/setings_activity_llbutton">
 
             <TextView
                 style="@style/settings_activity_viewtextstyle"
@@ -84,9 +82,7 @@
 
         <LinearLayout
             android:id="@+id/llfour"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/activity_settings_llheight"
-            android:gravity="center">
+            style="@style/setings_activity_llbutton">
 
             <TextView
                 style="@style/settings_activity_viewtextstyle"
