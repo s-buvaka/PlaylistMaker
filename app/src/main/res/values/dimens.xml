@@ -6,5 +6,7 @@
     <dimen name="button_main_marginTop">16dp</dimen>
     <dimen name="activity_settings_llheight">61dp</dimen>
     <dimen name="icon_back_size">20dp</dimen>
+    <dimen name="tv_marginStart">28dp</dimen>
+    <dimen name="tv_marginTop">17dp</dimen>
 
 </resources>

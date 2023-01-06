@@ -15,8 +15,12 @@
     </style>
 
     <style name="activity_settings_head">
-        <item name="android:textSize">22sp</item>
+        <item name="android:textSize">@dimen/text_size</item>
         <item name="android:textColor">?attr/colorSecondaryVariant</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/tv_marginStart</item>
+        <item name="android:layout_marginTop">@dimen/tv_marginTop</item>
     </style>
 
     <style name="settings_activity_viewtextstyle">

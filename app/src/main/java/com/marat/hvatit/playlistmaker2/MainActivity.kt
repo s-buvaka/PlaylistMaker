@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
 
         val buttonSearch = findViewById<Button>(R.id.button_bigOne)
         buttonSearch.setOnClickListener {
-            SearchActivity.getIntent(this@MainActivity,"android").apply { startActivity(this) }
+            SearchActivity.getIntent(this@MainActivity,this.getString(R.string.android)).apply { startActivity(this) }
 
         }
         //................................................................................
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         //................................................................................
         val buttonSettings = findViewById<Button>(R.id.button_bigThree)
         buttonSettings.setOnClickListener {
-            SettingsActivity.getIntent(this@MainActivity,"android").apply{
+            SettingsActivity.getIntent(this@MainActivity,this.getString(R.string.android)).apply{
                 startActivity(this)}
         }
     }

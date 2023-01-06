@@ -12,14 +12,14 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 
+const val EDITTEXT_TEXT = "EDITTEXT_TEXT"
+private const val TAG = "SearchActivity"
 
 class SearchActivity : AppCompatActivity() {
 
-     private var saveEditText: String? = "error"
+    private var saveEditText: String = "error"
 
     companion object {
-        const val EDITTEXT_TEXT = "EDITTEXT_TEXT"
-        private const val TAG = "SearchActivity"
 
         fun getIntent(context:Context, message: String): Intent {
             return Intent(context,SearchActivity::class.java).apply {
@@ -51,7 +51,7 @@ class SearchActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable?) {
                 //empty
-                saveEditText = editText.text.toString()
+                saveEditText = s.toString()
             }
 
         }
@@ -79,7 +79,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle){
         super.onRestoreInstanceState(savedInstanceState)
-        saveEditText = savedInstanceState.getString(EDITTEXT_TEXT)
+        saveEditText = savedInstanceState.getString(EDITTEXT_TEXT).toString()
     }
 
     private fun clearButtonVisibility(s: CharSequence?): Int {
