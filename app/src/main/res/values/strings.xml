@@ -1,4 +1,5 @@
 <resources>
+    <string name="android">Android - это круто,но сложна</string>
     <string name="app_name">Playlist Maker</string>
     <string name="title_appname">Playlist Maker</string>
     <string name="search_name">Поиск</string>
@@ -8,4 +9,12 @@
     <string name="share_name">Поделиться приложением</string>
     <string name="support_name">Написать в поддержку</string>
     <string name="user_agreement">Пользовательское соглашение</string>
+    <string name="tittle_Send">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
+    <string name="text_Send">Спасибо разработчикам и разработчицам за крутое приложение!</string>
+    <string name="text_share">https://practicum.yandex.ru/android-developer/</string>
+    <string name="text_useragreement">https://yandex.ru/legal/practicum_offer/</string>
+    <string name="my_email">decardcain21@gmail.com</string>
+    <string name="main_messege">Android - это круто!</string>
+    <string name="error">error</string>
+
 </resources>
