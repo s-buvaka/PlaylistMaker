@@ -11,6 +11,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.marat.hvatit.playlistmaker2.adapters.TrackListAdapter
+import com.marat.hvatit.playlistmaker2.models.Track
 
 const val EDITTEXT_TEXT = "EDITTEXT_TEXT"
 private const val TAG = "SearchActivity"
@@ -21,9 +25,9 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
 
-        fun getIntent(context:Context, message: String): Intent {
-            return Intent(context,SearchActivity::class.java).apply {
-                putExtra(TAG,message)
+        fun getIntent(context: Context, message: String): Intent {
+            return Intent(context, SearchActivity::class.java).apply {
+                putExtra(TAG, message)
             }
         }
     }
@@ -61,23 +65,30 @@ class SearchActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        buttonClear.setOnClickListener{
+        buttonClear.setOnClickListener {
             editText.requestFocus()
             editText.setText("")
-            (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(editText.windowToken, 0)
+            (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                editText.windowToken,
+                0
+            )
         }
+        val arraylist: ArrayList<Track>? = Companion.getIntent(this,this.getString(R.string.android)).getParcelableExtra("data")
+        //val intent: Intent = getIntent(this@SearchActivity, "data")
+        val recyclerSongList = findViewById<RecyclerView>(R.id.songlist)
+        recyclerSongList.layoutManager = LinearLayoutManager(this)
+        recyclerSongList.adapter = arraylist?.let { TrackListAdapter(it) }
 
-        Log.e("Hashcode", SearchActivity.hashCode().toString())
 
     }
 
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(EDITTEXT_TEXT,saveEditText)
+        outState.putString(EDITTEXT_TEXT, saveEditText)
         super.onSaveInstanceState(outState)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle){
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         saveEditText = savedInstanceState.getString(EDITTEXT_TEXT).toString()
     }
