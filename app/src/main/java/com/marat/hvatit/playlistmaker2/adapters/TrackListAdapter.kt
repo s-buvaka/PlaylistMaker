@@ -1,26 +1,30 @@
 package com.marat.hvatit.playlistmaker2.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.models.Track
+import com.bumptech.glide.Glide
 
 class TrackListAdapter(
         private val tracklist: List<Track>
         ): RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
-    class TrackViewHolder(itemView: ViewGroup) : RecyclerView.ViewHolder(itemView) {
+    class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackName: TextView
         private val artistName: TextView
         private val trackTime: TextView
-        //private val artworkUrl100: ImageView
+        private val trackImage: ImageView
 
         init {
-            val itemView = LayoutInflater.from(itemView.context).inflate(R.layout.search_cell,itemView,false)
+            //val itemView = LayoutInflater.from(itemView.context).inflate(R.layout.search_cell,itemView,false)
             trackName = itemView.findViewById(R.id.tvtrack_name)
             artistName = itemView.findViewById(R.id.tvartist_name)
             trackTime = itemView.findViewById(R.id.tv_songduration)
+            trackImage = itemView.findViewById(R.id.imageView2)
 
         }
 
@@ -28,6 +32,7 @@ class TrackListAdapter(
             trackName.text = model.trackName
             artistName.text = model.artistName
             trackTime.text = model.trackTime
+            Glide.with(itemView.context).load(model.artworkUrl100).into(trackImage)
 
         }
 
