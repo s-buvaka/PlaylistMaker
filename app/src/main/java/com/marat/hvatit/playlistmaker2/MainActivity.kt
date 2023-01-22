@@ -66,12 +66,12 @@ class MainActivity : AppCompatActivity() {
 
         val buttonSearch = findViewById<Button>(R.id.button_bigOne)
         buttonSearch.setOnClickListener {
-            SearchActivity.getIntent(this@MainActivity, this.getString(R.string.android)).putExtra(
-                "data",
-                data
-            )
-                .apply { startActivity(this) }
-
+            SearchActivity.getIntent(this@MainActivity, this.getString(R.string.android))
+                .apply { putExtra(
+                    "data",
+                    Companion.data
+                )
+                    startActivity(this) }
         }
         //................................................................................
         val buttonMedialib = findViewById<Button>(R.id.button_bigTwo)

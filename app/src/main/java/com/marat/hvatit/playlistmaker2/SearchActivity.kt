@@ -73,11 +73,12 @@ class SearchActivity : AppCompatActivity() {
                 0
             )
         }
-        val arraylist: ArrayList<Track>? = Companion.getIntent(this,this.getString(R.string.android)).getParcelableExtra("data")
+        val arraylist: ArrayList<Track>? =
+            Companion.getIntent(this,this.getString(R.string.android)).getParcelableExtra("data") as ArrayList<Track>?
         //val intent: Intent = getIntent(this@SearchActivity, "data")
         val recyclerSongList = findViewById<RecyclerView>(R.id.songlist)
         recyclerSongList.layoutManager = LinearLayoutManager(this)
-        recyclerSongList.adapter = arraylist?.let { TrackListAdapter(it) }
+        recyclerSongList.adapter = arraylist?.let { TrackListAdapter(tracklist = it) }
 
 
     }

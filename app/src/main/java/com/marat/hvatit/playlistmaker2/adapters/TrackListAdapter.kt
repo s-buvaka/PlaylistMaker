@@ -2,25 +2,25 @@ package com.marat.hvatit.playlistmaker2.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.models.Track
 
-class TrackListAdapter(private val tracklist: List<Track>) :
-    RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
+class TrackListAdapter(
+        private val tracklist: List<Track>
+        ): RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
     class TrackViewHolder(itemView: ViewGroup) : RecyclerView.ViewHolder(itemView) {
-        private val trackName: TextView = TODO()
+        private val trackName: TextView
         private val artistName: TextView
         private val trackTime: TextView
-        private val artworkUrl100: ImageView
+        //private val artworkUrl100: ImageView
 
         init {
             val itemView = LayoutInflater.from(itemView.context).inflate(R.layout.search_cell,itemView,false)
             trackName = itemView.findViewById(R.id.tvtrack_name)
             artistName = itemView.findViewById(R.id.tvartist_name)
-
+            trackTime = itemView.findViewById(R.id.tv_songduration)
 
         }
 
