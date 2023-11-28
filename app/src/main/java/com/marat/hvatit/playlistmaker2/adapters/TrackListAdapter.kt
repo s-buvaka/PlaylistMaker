@@ -9,10 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.models.Track
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class TrackListAdapter(
-        private val tracklist: List<Track>
-        ): RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
+    private val tracklist: List<Track>
+) : RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackName: TextView
         private val artistName: TextView
@@ -20,11 +21,10 @@ class TrackListAdapter(
         private val trackImage: ImageView
 
         init {
-            //val itemView = LayoutInflater.from(itemView.context).inflate(R.layout.search_cell,itemView,false)
             trackName = itemView.findViewById(R.id.tvtrack_name)
             artistName = itemView.findViewById(R.id.tvartist_name)
             trackTime = itemView.findViewById(R.id.tv_songduration)
-            trackImage = itemView.findViewById(R.id.imageView2)
+            trackImage = itemView.findViewById(R.id.imageView)
 
         }
 
@@ -32,7 +32,11 @@ class TrackListAdapter(
             trackName.text = model.trackName
             artistName.text = model.artistName
             trackTime.text = model.trackTime
-            Glide.with(itemView.context).load(model.artworkUrl100).into(trackImage)
+            Glide.with(itemView.context)
+                .load(model.artworkUrl100)
+                .placeholder(R.drawable.ic_launcher_background)
+                .transform(RoundedCorners(10))
+                .into(trackImage)
 
         }
 
