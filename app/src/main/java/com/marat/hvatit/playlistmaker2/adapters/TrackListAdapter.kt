@@ -19,6 +19,7 @@ class TrackListAdapter(
         private val artistName: TextView
         private val trackTime: TextView
         private val trackImage: ImageView
+        private val roundedCornersImage : Int = 10
 
         init {
             trackName = itemView.findViewById(R.id.tvtrack_name)
@@ -34,8 +35,8 @@ class TrackListAdapter(
             trackTime.text = model.trackTime
             Glide.with(itemView.context)
                 .load(model.artworkUrl100)
-                .placeholder(R.drawable.ic_launcher_background)
-                .transform(RoundedCorners(10))
+                .placeholder(R.drawable.placeholder)
+                .transform(RoundedCorners(roundedCornersImage))
                 .into(trackImage)
 
         }
