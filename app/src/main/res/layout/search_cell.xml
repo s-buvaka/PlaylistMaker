@@ -50,7 +50,7 @@
         android:id="@+id/tv_songduration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="13sp"
+        android:textSize="@dimen/text_size_cell"
         app:layout_constraintStart_toEndOf="@id/image_Point"
         app:layout_constraintTop_toTopOf="@id/tvartist_name"
         app:layout_constraintBottom_toBottomOf="@id/tvartist_name"
