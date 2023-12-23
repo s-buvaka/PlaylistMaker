@@ -13,45 +13,46 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        style="@style/activity_settings_head"
+        android:fontFamily="@font/ys_display_medium"
         android:text="@string/search_name"
         app:layout_constraintStart_toEndOf="@id/back"
-        app:layout_constraintTop_toTopOf="parent"
-        style="@style/activity_settings_head"
-        android:fontFamily="@font/ys_display_medium"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/ll_edittext"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
+        android:background="@drawable/ll_search"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/ll_search"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/back"
-        >
+        app:layout_constraintTop_toBottomOf="@id/back">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="13dp"
             android:layout_weight="1"
-            android:src="@drawable/ic_search"/>
+            android:src="@drawable/ic_search" />
 
         <EditText
             android:id="@+id/editText"
-            style="@style/activity_search_et"/>
+            style="@style/activity_search_et"
+            android:imeOptions="actionDone"
+            android:singleLine="true" />
 
         <ImageButton
             android:id="@+id/buttonClear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginEnd="10dp"
-            android:visibility="gone"
-            android:background="@drawable/ic_baseline_clear_24"/>
+            android:layout_weight="1"
+            android:background="@drawable/ic_baseline_clear_24"
+            android:visibility="gone" />
 
 
     </LinearLayout>
@@ -63,6 +64,41 @@
         android:layout_marginTop="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ll_edittext" />
+
+    <ImageView
+        android:id="@+id/activity_search_placeholder"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="210dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+         />
+
+    <TextView
+        android:id="@+id/activity_search_texterror"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/ys_display_medium"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_search_placeholder"
+         />
+
+    <ImageButton
+        android:id="@+id/activity_search_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:visibility="invisible"
+        android:background="@drawable/update"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_search_texterror"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="act_search_placeholder" />
+    <attr name="act_search_update" />
+</resources>

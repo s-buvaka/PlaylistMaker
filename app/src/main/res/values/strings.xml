@@ -16,5 +16,8 @@
     <string name="my_email">decardcain21@gmail.com</string>
     <string name="main_messege">Android - это круто!</string>
     <string name="error">error</string>
+    <string name="act_search_disconnect">Проблемы со связью\n\n Загрузка не удалась. \n Проверьте подключение к интернету</string>
+    <string name="act_search_nothing">Ничего не нашлось</string>
+    <string name="act_search_fine">Аминь?</string>
 
 </resources>

@@ -7,12 +7,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.marat.hvatit.playlistmaker2.R
-import com.marat.hvatit.playlistmaker2.models.Track
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.marat.hvatit.playlistmaker2.service.AppleSong
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TrackListAdapter(
-    private val tracklist: List<Track>
+    var tracklist: List<AppleSong>
 ) : RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackName: TextView
@@ -29,10 +31,10 @@ class TrackListAdapter(
 
         }
 
-        fun bind(model: Track) {
+        fun bind(model: AppleSong) {
             trackName.text = model.trackName
             artistName.text = model.artistName
-            trackTime.text = model.trackTime
+            trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMills.toLong())
             Glide.with(itemView.context)
                 .load(model.artworkUrl100)
                 .placeholder(R.drawable.placeholder)

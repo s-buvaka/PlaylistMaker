@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="act_search_placeholder">@color/white</item>
+        <item name="act_search_update">@color/pale_black</item>
     </style>
 
     <style name="activity_settings_head">
