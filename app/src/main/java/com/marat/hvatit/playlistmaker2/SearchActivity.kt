@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.marat.hvatit.playlistmaker2.adapters.TrackListAdapter
 import com.marat.hvatit.playlistmaker2.models.Track
 import com.google.gson.Gson
+import com.marat.hvatit.playlistmaker2.databinding.ActivityMainBinding
 import com.marat.hvatit.playlistmaker2.service.AppleMusicAPI
 import com.marat.hvatit.playlistmaker2.service.AppleSong
 import com.marat.hvatit.playlistmaker2.service.AppleSongResponce
@@ -38,8 +39,8 @@ private lateinit var disconnected: String
 private lateinit var nothingToShow: String
 private lateinit var allfine: String
 
-enum class SearchActivityState(val value: String) {
-    DISCONNECTED(""), NOTHINGTOSHOW(""), ALLFINE("")
+enum class SearchActivityState {
+    DISCONNECTED, NOTHINGTOSHOW, ALLFINE
 }
 
 class SearchActivity : AppCompatActivity() {
@@ -54,12 +55,13 @@ class SearchActivity : AppCompatActivity() {
 
     private val appleService = retrofit.create(AppleMusicAPI::class.java)
 
-    private var appleSongList = ArrayList<AppleSong>()
-    private var trackListAdapter = TrackListAdapter(appleSongList)
+    private val appleSongList = ArrayList<AppleSong>()
+    private val trackListAdapter = TrackListAdapter(appleSongList)
 
-    var placeholder: ImageView? = null
-    var texterror: TextView? = null
-    var buttonupdate: ImageButton? = null
+    private lateinit var placeholder: ImageView
+    private lateinit var texterror: TextView
+    private lateinit var buttonupdate: ImageButton
+    private lateinit var binding: ActivityMainBinding
     //Они мне тут не нравятся, как правильно с ними поступить и почему?)
 
     companion object {
@@ -79,6 +81,7 @@ class SearchActivity : AppCompatActivity() {
         val buttonBack = findViewById<View>(R.id.back)
         val buttonClear: ImageButton = findViewById(R.id.buttonClear)
         val recyclerSongList = findViewById<RecyclerView>(R.id.songlist)
+
         placeholder = findViewById(R.id.activity_search_placeholder)
         texterror = findViewById(R.id.activity_search_texterror)
         buttonupdate = findViewById(R.id.activity_search_update)

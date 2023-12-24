@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class TrackListAdapter(
-    var tracklist: List<AppleSong>
+    private val tracklist: List<AppleSong>
 ) : RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackName: TextView
@@ -22,6 +22,7 @@ class TrackListAdapter(
         private val trackTime: TextView
         private val trackImage: ImageView
         private val roundedCornersImage : Int = 10
+        private val simpleDateFormat:SimpleDateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
 
         init {
             trackName = itemView.findViewById(R.id.tvtrack_name)
@@ -34,13 +35,18 @@ class TrackListAdapter(
         fun bind(model: AppleSong) {
             trackName.text = model.trackName
             artistName.text = model.artistName
-            trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMills.toLong())
+            trackTime.text = dateFormat(model.trackTimeMills)
             Glide.with(itemView.context)
                 .load(model.artworkUrl100)
                 .placeholder(R.drawable.placeholder)
                 .transform(RoundedCorners(roundedCornersImage))
                 .into(trackImage)
 
+        }
+
+        private fun dateFormat(trackTime:String):String{
+            //SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMills.toLong())
+            return simpleDateFormat.format(trackTime.toLong())
         }
 
     }
