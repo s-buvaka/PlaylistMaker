@@ -5,10 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.marat.hvatit.playlistmaker2.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.marat.hvatit.playlistmaker2.models.Track
 import com.marat.hvatit.playlistmaker2.service.AppleSong
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -16,13 +18,16 @@ import java.util.Locale
 class TrackListAdapter(
     private val tracklist: List<AppleSong>
 ) : RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
+    var saveTrackListener: SaveTrackListener? = null
+
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackName: TextView
         private val artistName: TextView
         private val trackTime: TextView
         private val trackImage: ImageView
-        private val roundedCornersImage : Int = 10
-        private val simpleDateFormat:SimpleDateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
+        private val roundedCornersImage: Int = 10
+        private val simpleDateFormat: SimpleDateFormat =
+            SimpleDateFormat("mm:ss", Locale.getDefault())
 
         init {
             trackName = itemView.findViewById(R.id.tvtrack_name)
@@ -44,7 +49,7 @@ class TrackListAdapter(
 
         }
 
-        private fun dateFormat(trackTime:String):String{
+        private fun dateFormat(trackTime: String): String {
             //SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMills.toLong())
             return simpleDateFormat.format(trackTime.toLong())
         }
@@ -59,6 +64,15 @@ class TrackListAdapter(
     override fun getItemCount() = tracklist.size
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+        val item = tracklist[position]
         holder.bind(tracklist[position])
+        holder.itemView.setOnClickListener {
+            saveTrackListener?.addTrack(item)
+        }
+    }
+
+    fun interface SaveTrackListener {
+        fun addTrack(item: AppleSong)
+
     }
 }

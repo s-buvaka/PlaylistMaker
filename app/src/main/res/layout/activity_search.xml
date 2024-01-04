@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/c_activity_search"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme.PlaylistMaker2">
@@ -57,13 +58,54 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/songlist"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll_edittext" />
+        app:layout_constraintTop_toBottomOf="@id/ll_edittext"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_recyclercont"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/messagehistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/ys_display_medium"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="Вы искали"
+                android:textSize="19sp"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/songlist"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="top"
+                android:layout_weight="1"
+                tools:itemCount="6"
+                tools:listitem="@layout/search_cell" />
+
+            <ImageButton
+                android:id="@+id/clearhistory"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_gravity="top|center"
+                android:layout_margin="24dp"
+                android:layout_weight="0"
+                android:background="@drawable/clearhistory"
+                android:visibility="invisible" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 
     <ImageView
         android:id="@+id/activity_search_placeholder"
@@ -73,32 +115,30 @@
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-         />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/activity_search_texterror"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/ys_display_medium"
         android:layout_marginTop="16dp"
+        android:fontFamily="@font/ys_display_medium"
         android:textAlignment="center"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_search_placeholder"
-         />
+        app:layout_constraintTop_toBottomOf="@id/activity_search_placeholder" />
 
     <ImageButton
         android:id="@+id/activity_search_update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:visibility="invisible"
         android:background="@drawable/update"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_search_texterror"/>
+        app:layout_constraintTop_toBottomOf="@+id/activity_search_texterror" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

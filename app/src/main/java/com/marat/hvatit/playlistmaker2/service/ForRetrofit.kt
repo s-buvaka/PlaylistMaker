@@ -13,6 +13,7 @@ class AppleSongResponce(val resultcount: Int, val results: ArrayList<AppleSong>)
 }
 
 data class AppleSong(
+    val trackId : String,
     val trackName: String,
     val artistName: String,
     @SerializedName("trackTimeMillis")
