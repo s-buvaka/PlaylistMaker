@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
+import com.google.gson.Gson
 
 private const val PREFERENCE_NAME = "PREFERENCE_NAME"
 private const val PREFERENCE_VALUE = "value"
@@ -22,6 +23,8 @@ enum class ActionFilter {
 }
 
 class SettingsActivity : AppCompatActivity() {
+    private lateinit var  sharedPreferences : SharedPreferences
+    private val gson: Gson = Gson()
 
     companion object {
         fun getIntent(context: Context, message: String): Intent {
@@ -34,6 +37,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+        sharedPreferences = applicationContext.getSharedPreferences("cart", Context.MODE_PRIVATE)
 
         val buttonBack = findViewById<View>(R.id.back)
         val buttonSwitchTheme = findViewById<SwitchCompat>(R.id.bswitch)
@@ -54,6 +58,7 @@ class SettingsActivity : AppCompatActivity() {
             val mode =
                 if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
             AppCompatDelegate.setDefaultNightMode(mode)
+            saveThemeToCache(isChecked)
 
         }
 
@@ -101,6 +106,12 @@ class SettingsActivity : AppCompatActivity() {
                 startActivity(intentAction)
             }
         }
+    }
+
+    private fun saveThemeToCache(isNightModeEnabled : Boolean) {
+        sharedPreferences.edit()
+            .putBoolean("night_mode_enabled",  isNightModeEnabled )
+            .apply()
     }
 }
 

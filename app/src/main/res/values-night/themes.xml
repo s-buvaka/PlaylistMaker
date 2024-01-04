@@ -85,4 +85,8 @@
         <item name="android:lines">1</item>
     </style>
 
+    <style name="search_activity_usearch">
+        <item name="android:textColor">?attr/colorPrimaryVariant</item>
+    </style>
+
 </resources>

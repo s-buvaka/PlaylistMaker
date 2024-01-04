@@ -83,7 +83,8 @@
                 android:text="Вы искали"
                 android:textSize="19sp"
                 android:layout_gravity="center"
-                android:visibility="gone" />
+                android:visibility="gone"
+                style="@style/search_activity_usearch"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/songlist"
