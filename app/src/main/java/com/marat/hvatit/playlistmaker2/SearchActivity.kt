@@ -41,7 +41,7 @@ private lateinit var nothingToShow: String
 private lateinit var allfine: String
 
 enum class SearchActivityState {
-    DISCONNECTED, NOTHINGTOSHOW, ALLFINE, STARTSTATE
+    DISCONNECTED, NOTHINGTOSHOW, ALLFINE, STARTSTATE, CLEARSTATE
 }
 
 class SearchActivity : AppCompatActivity() {
@@ -120,6 +120,8 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 //empty
                 clearButtonVisibility(s).also { buttonClear.visibility = it }
+                activityState(SearchActivityState.CLEARSTATE)
+
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -250,6 +252,13 @@ class SearchActivity : AppCompatActivity() {
                 getSaveSongs()
                 clearHistory.isVisible = true
                 historyText.isVisible = true
+            }
+
+            SearchActivityState.CLEARSTATE -> {
+                appleSongList.clear()
+                clearHistory.isGone = true
+                historyText.isGone = true
+                trackListAdapter.notifyDataSetChanged()
             }
         }
     }
