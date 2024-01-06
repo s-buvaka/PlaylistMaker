@@ -154,7 +154,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         editText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
+            if (hasFocus&&!saveSongStack.isEmpty()) {
                 clearHistory.isVisible = true
                 historyText.isVisible = true
                 activityState(SearchActivityState.STARTSTATE)
