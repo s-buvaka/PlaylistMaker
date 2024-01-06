@@ -127,6 +127,9 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 //empty
                 saveEditText = s.toString()
+                if(s?.isEmpty() == true){
+                    activityState(SearchActivityState.STARTSTATE)
+                }
             }
 
         }
@@ -144,7 +147,10 @@ class SearchActivity : AppCompatActivity() {
                 editText.windowToken,
                 0
             )
-            appleSongList.clear()
+            //appleSongList.clear()
+            if (saveSongStack.isEmpty()){
+                activityState(SearchActivityState.CLEARSTATE)
+            }
             trackListAdapter.notifyDataSetChanged()
         }
 
