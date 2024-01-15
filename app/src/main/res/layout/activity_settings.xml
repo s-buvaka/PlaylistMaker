@@ -8,6 +8,7 @@
     <View
         android:id="@+id/back"
         style="@style/activity_settings_viewback"
+        android:layout_marginTop="@dimen/icon_back_size"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -6,23 +6,32 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-class AppleSongResponce(val resultcount: Int, val results: ArrayList<AppleSong>){
+class AppleSongResponce(val resultcount: Int, val results: ArrayList<AppleSong>) {
     override fun toString(): String {
         return "AppleSongResponce(resultcount=$resultcount, results=$results)"
     }
 }
 
 data class AppleSong(
-    val trackId : String,
+    val trackId: String,
     val trackName: String,
     val artistName: String,
     @SerializedName("trackTimeMillis")
     val trackTimeMills: String,
-    val artworkUrl100: String
+    val artworkUrl100: String,
+    @SerializedName("country")
+    val country: String,
+    @SerializedName("primaryGenreName")
+    val genre: String,
+    @SerializedName("releaseDate")
+    val year: String,
+    @SerializedName("collectionName")
+    val album: String
 ) {
     override fun toString(): String {
-        return "AppleSong(trackName='$trackName', artistName='$artistName', trackTimeMills=$trackTimeMills, artworkUrl100='$artworkUrl100')"
+        return "AppleSong(trackId='$trackId', trackName='$trackName', artistName='$artistName', trackTimeMills='$trackTimeMills', artworkUrl100='$artworkUrl100', country='$country', genre='$genre', year='$year', album='$album')"
     }
+
 }
 
 interface AppleMusicAPI {

@@ -20,6 +20,7 @@
         style="@style/search_activity_sellsongname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintWidth_max="250dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="14dp"
         app:layout_constraintStart_toEndOf="@id/imageView"
@@ -31,6 +32,7 @@
         style="@style/search_activity_sellsongartist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintWidth_max="250dp"
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@id/imageView"
         app:layout_constraintTop_toBottomOf="@id/tvtrack_name"
@@ -40,10 +42,10 @@
         android:id="@+id/image_Point"
         android:layout_width="13dp"
         android:layout_height="13dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@id/tvartist_name"
         app:layout_constraintStart_toEndOf="@id/tvartist_name"
         app:layout_constraintTop_toTopOf="@id/tvartist_name"
-        app:layout_constraintBottom_toBottomOf="@id/tvartist_name"
-        android:scaleType="fitCenter"
         app:srcCompat="@drawable/ic_point" />
 
     <TextView
@@ -51,9 +53,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size_cell"
+        app:layout_constraintBottom_toBottomOf="@id/tvartist_name"
         app:layout_constraintStart_toEndOf="@id/image_Point"
         app:layout_constraintTop_toTopOf="@id/tvartist_name"
-        app:layout_constraintBottom_toBottomOf="@id/tvartist_name"
         tools:text="5:50" />
 
 

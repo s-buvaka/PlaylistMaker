@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AudioplayerActivity">
+
+    <View
+        android:id="@+id/back"
+        style="@style/activity_settings_viewback"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/actplayer_cover"
+        android:layout_width="312dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back"
+        app:layout_constraintBottom_toBottomOf="@id/barrier"
+        tools:background="@drawable/placeholder" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="actplayer_track_name" />
+
+    <TextView
+        android:id="@+id/actplayer_track_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="12dp"
+        android:fontFamily="@font/ys_display_medium"
+        android:textSize="22sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/actplayer_artist_name"
+        tools:text="Song Name Blablabla"
+        style="@style/player_activity_artisttrackname"/>
+
+    <TextView
+        android:id="@+id/actplayer_artist_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="12dp"
+        android:fontFamily="@font/ys_display_medium"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/actplayer_buttonplay"
+        tools:text="Artist Name"
+        style="@style/player_activity_artisttrackname"/>
+
+    <ImageButton
+        android:id="@+id/actplayer_buttonplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/button_play"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/actplayer_tracktime" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_add_audio"
+        app:layout_constraintEnd_toStartOf="@id/actplayer_buttonplay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/actplayer_buttonplay"
+        app:layout_constraintTop_toTopOf="@id/actplayer_buttonplay" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_heart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/actplayer_buttonplay"
+        app:layout_constraintTop_toTopOf="@id/actplayer_buttonplay"
+        app:layout_constraintBottom_toBottomOf="@id/actplayer_buttonplay"/>
+
+    <TextView
+        android:id="@+id/actplayer_tracktime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="39dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_duration"
+        android:text="0:30" />
+
+    <TextView
+        android:id="@+id/actplayer_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_album"
+        android:text="@string/actplayer_duration"
+        style="@style/player_activity_textcolumn"/>
+
+    <TextView
+        android:id="@+id/actplayer_album"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_year"
+        android:text="@string/actplayer_album"
+        style="@style/player_activity_textcolumn"/>
+
+    <TextView
+        android:id="@+id/actplayer_year"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_genre"
+        android:text="@string/actplayer_year"
+        style="@style/player_activity_textcolumn"/>
+
+    <TextView
+        android:id="@+id/actplayer_genre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_country"
+        android:text="@string/actplayer_genre"
+        style="@style/player_activity_textcolumn"/>
+
+    <TextView
+        android:id="@+id/actplayer_country"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="28dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/actplayer_country"
+        style="@style/player_activity_textcolumn"/>
+
+    <TextView
+        android:id="@+id/actplayer_countryvalue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="CountryValue"
+        style="@style/player_activity_textcontent"/>
+
+    <TextView
+        android:id="@+id/actplayer_genrevalue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_country"
+        android:text="GenreValue"
+        style="@style/player_activity_textcontent"/>
+
+    <TextView
+        android:id="@+id/actplayer_yearvalue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_genre"
+        android:text="YearValue"
+        style="@style/player_activity_textcontent"/>
+
+    <TextView
+        android:id="@+id/actplayer_albumvalue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_max="300dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_year"
+        android:text="AlbumValue"
+        style="@style/player_activity_textcontent"/>
+
+    <TextView
+        android:id="@+id/actplayer_durationvalue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="9dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/actplayer_album"
+        android:text="DurationValue"
+        style="@style/player_activity_textcontent"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

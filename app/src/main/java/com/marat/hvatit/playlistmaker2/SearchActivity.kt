@@ -17,13 +17,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.marat.hvatit.playlistmaker2.adapters.TrackListAdapter
-import com.marat.hvatit.playlistmaker2.databinding.ActivityMainBinding
 import com.marat.hvatit.playlistmaker2.datasource.SaveStack
 import com.marat.hvatit.playlistmaker2.service.AppleMusicAPI
 import com.marat.hvatit.playlistmaker2.service.AppleSong
@@ -52,6 +51,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var contRecyclerView: LinearLayoutCompat
 
     private val appleBaseUrl = "https://itunes.apple.com"
+
+    private val gson: Gson = Gson()
 
     private val retrofit =
         Retrofit.Builder().baseUrl(appleBaseUrl).addConverterFactory(GsonConverterFactory.create())
@@ -127,7 +128,12 @@ class SearchActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 //empty
                 saveEditText = s.toString()
-                if(s?.isEmpty() == true){
+                if (s?.isEmpty() == true) {
+                    if (saveSongStack.isEmpty()) {
+                        activityState(SearchActivityState.CLEARSTATE)
+                    } else {
+                        activityState(SearchActivityState.ALLFINE)
+                    }
                     activityState(SearchActivityState.STARTSTATE)
                 }
             }
@@ -148,8 +154,10 @@ class SearchActivity : AppCompatActivity() {
                 0
             )
             //appleSongList.clear()
-            if (saveSongStack.isEmpty()){
+            if (saveSongStack.isEmpty()) {
                 activityState(SearchActivityState.CLEARSTATE)
+            } else {
+                activityState(SearchActivityState.ALLFINE)
             }
             trackListAdapter.notifyDataSetChanged()
         }
@@ -162,7 +170,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         editText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus&&!saveSongStack.isEmpty()) {
+            if (hasFocus && !saveSongStack.isEmpty()) {
                 clearHistory.isVisible = true
                 historyText.isVisible = true
                 activityState(SearchActivityState.STARTSTATE)
@@ -183,6 +191,11 @@ class SearchActivity : AppCompatActivity() {
 
         trackListAdapter.saveTrackListener = TrackListAdapter.SaveTrackListener {
             addSaveSongs(it)
+            AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
+                .apply {
+                    putExtra("Track", gson.toJson(it))
+                    startActivity(this)
+                }
         }
 
         buttonupdate.setOnClickListener {
@@ -226,11 +239,8 @@ class SearchActivity : AppCompatActivity() {
                         200 -> {
                             if (responce.body()?.results?.isEmpty() == false) {
                                 appleSongList.clear()
-                                Log.e("notify1", "1")
                                 activityState(SearchActivityState.ALLFINE)
                                 appleSongList.addAll(responce.body()!!.results)
-                                Log.e("notify1", "3")
-                                Log.e("response", appleSongList.toString())
                             } else {
                                 activityState(SearchActivityState.NOTHINGTOSHOW)
                             }
@@ -256,8 +266,10 @@ class SearchActivity : AppCompatActivity() {
             SearchActivityState.ALLFINE -> placeholderHandler(allfine)
             SearchActivityState.STARTSTATE -> {
                 getSaveSongs()
-                clearHistory.isVisible = true
-                historyText.isVisible = true
+                if(!saveSongStack.isEmpty()){
+                    clearHistory.isVisible = true
+                    historyText.isVisible = true
+                }
             }
 
             SearchActivityState.CLEARSTATE -> {
@@ -294,8 +306,8 @@ class SearchActivity : AppCompatActivity() {
                 texterror.isVisible = false
             }
         }
-        clearHistory.isGone = true
-        historyText.isGone = true
+        /*clearHistory.isGone = true
+        historyText.isGone = true*/
         trackListAdapter.notifyDataSetChanged()
     }
 
