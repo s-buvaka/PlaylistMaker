@@ -2,21 +2,23 @@ package com.marat.hvatit.playlistmaker2
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -40,15 +42,12 @@ private lateinit var nothingToShow: String
 private lateinit var allfine: String
 
 enum class SearchActivityState {
-    DISCONNECTED, NOTHINGTOSHOW, ALLFINE, STARTSTATE, CLEARSTATE
+    DISCONNECTED, NOTHINGTOSHOW, ALLFINE, STARTSTATE, CLEARSTATE, DOWNLOAD
 }
 
 class SearchActivity : AppCompatActivity() {
 
     private var saveEditText: String = "error"
-    private lateinit var displayMetrics: DisplayMetrics
-    private lateinit var defaultRecyclerParams: ViewGroup.LayoutParams
-    private lateinit var contRecyclerView: LinearLayoutCompat
 
     private val appleBaseUrl = "https://itunes.apple.com"
 
@@ -70,8 +69,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var buttonupdate: ImageButton
     private lateinit var historyText: TextView
     private lateinit var clearHistory: ImageButton
+    private lateinit var progressBar: ProgressBar
 
     companion object {
+
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
 
         fun getIntent(context: Context, message: String): Intent {
             return Intent(context, SearchActivity::class.java).apply {
@@ -79,6 +82,16 @@ class SearchActivity : AppCompatActivity() {
             }
         }
     }
+
+    private var searchText : String? = null
+    private val searchRunnable: Runnable = object :Runnable {
+        override fun run() {
+            searchText?.let { search(it) }
+        }
+    }
+
+    private var isClickAllowed = true
+    private val handler = Handler(Looper.getMainLooper())
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,15 +101,13 @@ class SearchActivity : AppCompatActivity() {
         val buttonBack = findViewById<View>(R.id.back)
         val buttonClear: ImageButton = findViewById(R.id.buttonClear)
         val recyclerSongList = findViewById<RecyclerView>(R.id.songlist)
-        defaultRecyclerParams = recyclerSongList.layoutParams
-
         //...............................................................
         historyText = findViewById(R.id.messagehistory)
         clearHistory = findViewById(R.id.clearhistory)
+        progressBar = findViewById(R.id.progressBar)
 
         saveSongStack = SaveStack<AppleSong>(applicationContext, 10)
         saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
-        displayMetrics = resources.displayMetrics
         //...............................................................
         placeholder = findViewById(R.id.activity_search_placeholder)
         texterror = findViewById(R.id.activity_search_texterror)
@@ -105,7 +116,6 @@ class SearchActivity : AppCompatActivity() {
         nothingToShow = applicationContext.getString(R.string.act_search_nothing)
         allfine = applicationContext.getString(R.string.act_search_fine)
         //...............................................................
-        contRecyclerView = findViewById(R.id.ll_recyclercont)
         recyclerSongList.layoutManager = LinearLayoutManager(this)
         recyclerSongList.adapter = trackListAdapter
 
@@ -114,21 +124,30 @@ class SearchActivity : AppCompatActivity() {
         }
         //..............................................................
         val simpletextWatcher = object : TextWatcher {
+            @RequiresApi(Build.VERSION_CODES.Q)
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 //empty
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 //empty
+                Log.e("activityState", "2")
                 clearButtonVisibility(s).also { buttonClear.visibility = it }
-                activityState(SearchActivityState.CLEARSTATE)
+                if (s.isNullOrEmpty()) {
+                    handler.removeCallbacks(searchRunnable)
+                    activityState(SearchActivityState.STARTSTATE)
+                } else {
+                    searchText = s.toString()
+                    searchDebounce()
+                }
 
             }
 
             override fun afterTextChanged(s: Editable?) {
-                //empty
+                Log.e("activityState", "3")
                 saveEditText = s.toString()
-                if (s?.isEmpty() == true) {
+                if (s.isNullOrEmpty()) {
+                    handler.removeCallbacks(searchRunnable)
                     if (saveSongStack.isEmpty()) {
                         activityState(SearchActivityState.CLEARSTATE)
                     } else {
@@ -190,12 +209,14 @@ class SearchActivity : AppCompatActivity() {
         }
 
         trackListAdapter.saveTrackListener = TrackListAdapter.SaveTrackListener {
-            addSaveSongs(it)
-            AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
-                .apply {
-                    putExtra("Track", gson.toJson(it))
-                    startActivity(this)
-                }
+            if (clickDebounce()) {
+                addSaveSongs(it)
+                AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
+                    .apply {
+                        putExtra("Track", gson.toJson(it))
+                        startActivity(this)
+                    }
+            }
         }
 
         buttonupdate.setOnClickListener {
@@ -229,6 +250,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun search(text: String) {
+        activityState(SearchActivityState.DOWNLOAD)
         appleService.search(text)
             .enqueue(object : Callback<AppleSongResponce> {
                 override fun onResponse(
@@ -261,53 +283,75 @@ class SearchActivity : AppCompatActivity() {
 
     private fun activityState(state: SearchActivityState) {
         when (state) {
-            SearchActivityState.DISCONNECTED -> placeholderHandler(disconnected)
-            SearchActivityState.NOTHINGTOSHOW -> placeholderHandler(nothingToShow)
-            SearchActivityState.ALLFINE -> placeholderHandler(allfine)
-            SearchActivityState.STARTSTATE -> {
-                getSaveSongs()
-                if(!saveSongStack.isEmpty()){
-                    clearHistory.isVisible = true
-                    historyText.isVisible = true
-                }
-            }
-
-            SearchActivityState.CLEARSTATE -> {
-                appleSongList.clear()
-                clearHistory.isGone = true
-                historyText.isGone = true
-                trackListAdapter.notifyDataSetChanged()
-            }
-        }
-    }
-
-    private fun placeholderHandler(placeholderMessage: String) {
-        when (placeholderMessage) {
-            nothingToShow -> {
-                appleSongList.clear()
-                placeholder.setImageResource(R.drawable.nothing_problem)
-                placeholder.isVisible = true
-                texterror.text = placeholderMessage
-                texterror.isVisible = true
-            }
-
-            disconnected -> {
+            SearchActivityState.DISCONNECTED -> {
                 appleSongList.clear()
                 placeholder.setImageResource(R.drawable.disconnect_problem)
                 placeholder.isVisible = true
                 buttonupdate.isVisible = true
-                texterror.text = placeholderMessage
+                texterror.text = disconnected
                 texterror.isVisible = true
+                clearHistory.isVisible = false
+                historyText.isVisible = false
+                progressBar.isVisible = false
+                Log.e("activityState", "DISCONNECTED")
             }
 
-            allfine -> {
+            SearchActivityState.NOTHINGTOSHOW -> {
+                appleSongList.clear()
+                placeholder.setImageResource(R.drawable.nothing_problem)
+                placeholder.isVisible = true
+                texterror.text = nothingToShow
+                texterror.isVisible = true
+                clearHistory.isVisible = false
+                historyText.isVisible = false
+                progressBar.isVisible = false
+                Log.e("activityState", "NOTHINGTOSHOW")
+            }
+
+            SearchActivityState.ALLFINE -> {
                 buttonupdate.isVisible = false
                 placeholder.isVisible = false
                 texterror.isVisible = false
+                progressBar.isVisible = false
+                Log.e("activityState", "ALLFINE")
+            }
+
+            SearchActivityState.STARTSTATE -> {
+                progressBar.isVisible = false
+                buttonupdate.isVisible = false
+                placeholder.isVisible = false
+                texterror.isVisible = false
+                getSaveSongs()
+                if (!saveSongStack.isEmpty()) {
+                    clearHistory.isVisible = true
+                    historyText.isVisible = true
+                }
+                Log.e("activityState", "STARTSTATE")
+            }
+
+            SearchActivityState.CLEARSTATE -> {
+                appleSongList.clear()
+                progressBar.isVisible = false
+                clearHistory.isGone = true
+                historyText.isGone = true
+                buttonupdate.isVisible = false
+                placeholder.isVisible = false
+                texterror.isVisible = false
+                trackListAdapter.notifyDataSetChanged()
+                Log.e("activityState", "CLEARSTATE")
+            }
+
+            SearchActivityState.DOWNLOAD -> {
+                appleSongList.clear()
+                progressBar.isVisible = true
+                clearHistory.isGone = true
+                historyText.isGone = true
+                buttonupdate.isVisible = false
+                placeholder.isVisible = false
+                texterror.isVisible = false
+                Log.e("activityState", "DOWNLOAD")
             }
         }
-        /*clearHistory.isGone = true
-        historyText.isGone = true*/
         trackListAdapter.notifyDataSetChanged()
     }
 
@@ -323,6 +367,21 @@ class SearchActivity : AppCompatActivity() {
             saveSongStack.remove(item)
         }
         saveSongStack.pushElement(item)
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+        //search(symbol)
     }
 
 }
