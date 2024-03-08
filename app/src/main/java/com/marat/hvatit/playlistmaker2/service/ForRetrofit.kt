@@ -26,10 +26,12 @@ data class AppleSong(
     @SerializedName("releaseDate")
     val year: String,
     @SerializedName("collectionName")
-    val album: String
+    val album: String,
+    @SerializedName("previewUrl")
+    val priviewUrl: String
 ) {
     override fun toString(): String {
-        return "AppleSong(trackId='$trackId', trackName='$trackName', artistName='$artistName', trackTimeMills='$trackTimeMills', artworkUrl100='$artworkUrl100', country='$country', genre='$genre', year='$year', album='$album')"
+        return "AppleSong(trackId='$trackId', trackName='$trackName', artistName='$artistName', trackTimeMills='$trackTimeMills', artworkUrl100='$artworkUrl100', country='$country', genre='$genre', year='$year', album='$album', priviewUrl='$priviewUrl')"
     }
 
 }

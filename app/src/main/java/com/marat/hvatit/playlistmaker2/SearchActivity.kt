@@ -83,12 +83,8 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private var searchText : String? = null
-    private val searchRunnable: Runnable = object :Runnable {
-        override fun run() {
-            searchText?.let { search(it) }
-        }
-    }
+    private var searchText: String? = null
+    private val searchRunnable: Runnable = Runnable { searchText?.let { search(it) } }
 
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
@@ -97,6 +93,9 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+        Log.e("activityState", "OnCreate")
+        Log.e("activityState", "${retrofit.hashCode()}")
+        Log.e("activityState", "${appleService.hashCode()}")
         val editText = findViewById<EditText>(R.id.editText)
         val buttonBack = findViewById<View>(R.id.back)
         val buttonClear: ImageButton = findViewById(R.id.buttonClear)
@@ -130,17 +129,8 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                //empty
                 Log.e("activityState", "2")
                 clearButtonVisibility(s).also { buttonClear.visibility = it }
-                if (s.isNullOrEmpty()) {
-                    handler.removeCallbacks(searchRunnable)
-                    activityState(SearchActivityState.STARTSTATE)
-                } else {
-                    searchText = s.toString()
-                    searchDebounce()
-                }
-
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -151,9 +141,12 @@ class SearchActivity : AppCompatActivity() {
                     if (saveSongStack.isEmpty()) {
                         activityState(SearchActivityState.CLEARSTATE)
                     } else {
-                        activityState(SearchActivityState.ALLFINE)
+                        activityState(SearchActivityState.STARTSTATE)
                     }
-                    activityState(SearchActivityState.STARTSTATE)
+                } else {
+                    searchText = s.toString()
+                    Log.e("activityState", "${searchText}")
+                    searchDebounce()
                 }
             }
 
@@ -176,13 +169,14 @@ class SearchActivity : AppCompatActivity() {
             if (saveSongStack.isEmpty()) {
                 activityState(SearchActivityState.CLEARSTATE)
             } else {
-                activityState(SearchActivityState.ALLFINE)
+                activityState(SearchActivityState.STARTSTATE)
             }
             trackListAdapter.notifyDataSetChanged()
         }
 
         editText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                handler.removeCallbacks(searchRunnable)
                 search(editText.text.toString())
             }
             false
@@ -223,10 +217,12 @@ class SearchActivity : AppCompatActivity() {
             search(editText.text.toString())
         }
 
+
     }
 
     override fun onStop() {
         super.onStop()
+        handler.removeCallbacks(searchRunnable)
         saveSongStack.onStop()
     }
 
@@ -251,6 +247,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun search(text: String) {
         activityState(SearchActivityState.DOWNLOAD)
+        //appleService.search(text).execute()
         appleService.search(text)
             .enqueue(object : Callback<AppleSongResponce> {
                 override fun onResponse(
@@ -261,8 +258,9 @@ class SearchActivity : AppCompatActivity() {
                         200 -> {
                             if (responce.body()?.results?.isEmpty() == false) {
                                 appleSongList.clear()
-                                activityState(SearchActivityState.ALLFINE)
+                                activityState(SearchActivityState.CLEARSTATE)
                                 appleSongList.addAll(responce.body()!!.results)
+                                Log.e("responce", responce.body()?.results.toString())
                             } else {
                                 activityState(SearchActivityState.NOTHINGTOSHOW)
                             }
@@ -282,6 +280,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun activityState(state: SearchActivityState) {
+        //переделать на манер sealedClass
         when (state) {
             SearchActivityState.DISCONNECTED -> {
                 appleSongList.clear()
@@ -355,7 +354,7 @@ class SearchActivity : AppCompatActivity() {
         trackListAdapter.notifyDataSetChanged()
     }
 
-    private fun getSaveSongs() {
+    private fun getSaveSongs() {//изменить название
         appleSongList.clear()
         appleSongList.addAll(saveSongStack)
         trackListAdapter.notifyDataSetChanged()
@@ -381,7 +380,6 @@ class SearchActivity : AppCompatActivity() {
     private fun searchDebounce() {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
-        //search(symbol)
     }
 
 }
