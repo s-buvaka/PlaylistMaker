@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">@color/pale_black</item>
         <item name="colorOnSecondary">@color/pale_black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/pale_black</item>
         <!-- Customize your theme here. -->
         <item name="act_search_placeholder">@color/white</item>
         <item name="act_search_update">@color/pale_black</item>

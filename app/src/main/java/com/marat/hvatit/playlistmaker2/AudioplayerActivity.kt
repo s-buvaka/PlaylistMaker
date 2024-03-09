@@ -35,9 +35,6 @@ class AudioplayerActivity : AppCompatActivity() {
     private val simpleDateFormat: SimpleDateFormat =
         SimpleDateFormat("mm:ss", Locale.getDefault())
 
-    private val dateTimeFormat: SimpleDateFormat =
-        SimpleDateFormat("yyyy", Locale.getDefault())
-
 
     private lateinit var actplayerCover: ImageView
     private val roundedCornersImage: Int = 10
@@ -119,6 +116,7 @@ class AudioplayerActivity : AppCompatActivity() {
         genrevalue.setText(song.genre)
         yearvalue.setText(song.year.substring(0, song.year.indexOf("-")))
         albumvalue.setText(song.album)
+        priviewTimer.text = "00:30"
     }
 
     private fun preparePlayer(url: String) {
@@ -128,22 +126,25 @@ class AudioplayerActivity : AppCompatActivity() {
             buttonPlay.isEnabled = true
             playerState = MediaPlayerState.STATE_PREPARED
         }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        updateTimer()
+        playerState = MediaPlayerState.STATE_PLAYING
+        buttonPlay.setBackgroundResource(R.drawable.button_stop)
         mediaPlayer.setOnCompletionListener {
-            handler.removeCallbacks(timerRunnable)
-            buttonPlay.setBackgroundResource(R.drawable.button_play)
+            stopTimer()
             priviewTimer.text = "00:00"
+            mediaPlayer.seekTo(0)
+            buttonPlay.setBackgroundResource(R.drawable.button_play)
             playerState = MediaPlayerState.STATE_PREPARED
 
         }
     }
 
-    private fun startPlayer() {
-        mediaPlayer.start()
-        playerState = MediaPlayerState.STATE_PLAYING
-        buttonPlay.setBackgroundResource(R.drawable.button_stop)
-    }
-
     private fun pausePlayer() {
+        stopTimer()
         mediaPlayer.pause()
         playerState = MediaPlayerState.STATE_PAUSED
         buttonPlay.setBackgroundResource(R.drawable.button_play)
@@ -152,17 +153,18 @@ class AudioplayerActivity : AppCompatActivity() {
     private fun playbackControl() {
         when (playerState) {
             MediaPlayerState.STATE_PLAYING -> {
-                handler.removeCallbacks(timerRunnable)
                 pausePlayer()
             }
-
-            MediaPlayerState.STATE_PREPARED, MediaPlayerState.STATE_PAUSED -> {
-                updateTimer()
+            MediaPlayerState.STATE_PAUSED ->{
                 startPlayer()
             }
 
             MediaPlayerState.STATE_DEFAULT -> {
                 preparePlayer(priviewUrl)
+            }
+
+            MediaPlayerState.STATE_PREPARED -> {
+                startPlayer()
             }
         }
     }
@@ -179,10 +181,17 @@ class AudioplayerActivity : AppCompatActivity() {
     }
 
     private fun updateTimer() {
+        stopTimer()
         priviewTimer.text =
             SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-        handler.postDelayed(timerRunnable, 2000L)
-        Log.e("timerAudio", "Timer" + mediaPlayer.currentPosition.toString())
+        handler.postDelayed(timerRunnable, 1000L)
+        //Log.e("timerAudio", "Timer:${mediaPlayer.currentPosition/1000}")
+        //Log.e("StateAudioPlayer","${mediaPlayer.currentPosition/1000}+/+${priviewTimer.text}")
+        //Log.e("AudioPlayerHash",mediaPlayer.hashCode().toString())
+    }
+
+    private fun stopTimer(){
+        handler.removeCallbacks(timerRunnable)
     }
 
 }
