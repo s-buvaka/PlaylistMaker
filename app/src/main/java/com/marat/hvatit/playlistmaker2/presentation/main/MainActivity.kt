@@ -1,4 +1,4 @@
-package com.marat.hvatit.playlistmaker2
+package com.marat.hvatit.playlistmaker2.presentation.main
 
 import android.content.Context
 import android.content.Intent
@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.gson.reflect.TypeToken
-import com.marat.hvatit.playlistmaker2.service.AppleSong
+import com.marat.hvatit.playlistmaker2.presentation.medialibrary.MedialibraryActivity
+import com.marat.hvatit.playlistmaker2.R
+import com.marat.hvatit.playlistmaker2.presentation.search.SearchActivity
+import com.marat.hvatit.playlistmaker2.presentation.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences

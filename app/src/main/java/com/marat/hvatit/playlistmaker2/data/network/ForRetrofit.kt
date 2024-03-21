@@ -1,4 +1,4 @@
-package com.marat.hvatit.playlistmaker2.service
+package com.marat.hvatit.playlistmaker2.data.network
 
 import com.google.gson.annotations.SerializedName
 import retrofit2.Call

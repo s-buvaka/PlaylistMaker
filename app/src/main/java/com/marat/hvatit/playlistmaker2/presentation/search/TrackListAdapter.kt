@@ -1,17 +1,15 @@
-package com.marat.hvatit.playlistmaker2.adapters
+package com.marat.hvatit.playlistmaker2.presentation.search
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.marat.hvatit.playlistmaker2.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.marat.hvatit.playlistmaker2.models.Track
-import com.marat.hvatit.playlistmaker2.service.AppleSong
+import com.marat.hvatit.playlistmaker2.data.network.AppleSong
+import com.marat.hvatit.playlistmaker2.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 

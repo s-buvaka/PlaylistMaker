@@ -1,4 +1,4 @@
-package com.marat.hvatit.playlistmaker2
+package com.marat.hvatit.playlistmaker2.presentation.search
 
 import android.content.Context
 import android.content.Intent
@@ -24,11 +24,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.marat.hvatit.playlistmaker2.adapters.TrackListAdapter
-import com.marat.hvatit.playlistmaker2.datasource.SaveStack
-import com.marat.hvatit.playlistmaker2.service.AppleMusicAPI
-import com.marat.hvatit.playlistmaker2.service.AppleSong
-import com.marat.hvatit.playlistmaker2.service.AppleSongResponce
+import com.marat.hvatit.playlistmaker2.data.network.AppleMusicAPI
+import com.marat.hvatit.playlistmaker2.data.network.AppleSong
+import com.marat.hvatit.playlistmaker2.data.network.AppleSongResponce
+import com.marat.hvatit.playlistmaker2.presentation.audioplayer.AudioplayerActivity
+import com.marat.hvatit.playlistmaker2.R
+import com.marat.hvatit.playlistmaker2.domain.models.SaveStack
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

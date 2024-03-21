@@ -1,4 +1,4 @@
-package com.marat.hvatit.playlistmaker2
+package com.marat.hvatit.playlistmaker2.presentation.settings
 
 import android.content.Context
 import android.content.Intent
@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
 import com.google.gson.Gson
+import com.marat.hvatit.playlistmaker2.R
 
 private const val PREFERENCE_NAME = "PREFERENCE_NAME"
 private const val PREFERENCE_VALUE = "value"
