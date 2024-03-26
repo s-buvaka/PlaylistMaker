@@ -24,15 +24,13 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.marat.hvatit.playlistmaker2.data.network.AppleMusicAPI
-import com.marat.hvatit.playlistmaker2.data.network.AppleSong
-import com.marat.hvatit.playlistmaker2.data.network.AppleSongResponce
+import com.marat.hvatit.playlistmaker2.data.network.AppleMusicApiService
 import com.marat.hvatit.playlistmaker2.presentation.audioplayer.AudioplayerActivity
 import com.marat.hvatit.playlistmaker2.R
+import com.marat.hvatit.playlistmaker2.data.creator.Creator
+import com.marat.hvatit.playlistmaker2.domain.api.TrackInteractor
 import com.marat.hvatit.playlistmaker2.domain.models.SaveStack
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.marat.hvatit.playlistmaker2.domain.models.Track
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -58,11 +56,14 @@ class SearchActivity : AppCompatActivity() {
         Retrofit.Builder().baseUrl(appleBaseUrl).addConverterFactory(GsonConverterFactory.create())
             .build()
 
-    private val appleService = retrofit.create(AppleMusicAPI::class.java)
+    private val appleService = retrofit.create(AppleMusicApiService::class.java)
+
+    private val creator: Creator = Creator
+    private val interactor = creator.provideTrackInteractor()
 
 
-    private lateinit var saveSongStack: SaveStack<AppleSong>
-    private val appleSongList = ArrayList<AppleSong>()
+    private lateinit var saveSongStack: SaveStack<Track>
+    private val appleSongList = ArrayList<Track>()
     private val trackListAdapter = TrackListAdapter(appleSongList)
 
     private lateinit var placeholder: ImageView
@@ -106,7 +107,7 @@ class SearchActivity : AppCompatActivity() {
         clearHistory = findViewById(R.id.clearhistory)
         progressBar = findViewById(R.id.progressBar)
 
-        saveSongStack = SaveStack<AppleSong>(applicationContext, 10)
+        saveSongStack = SaveStack<Track>(applicationContext, 10)
         saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
         //...............................................................
         placeholder = findViewById(R.id.activity_search_placeholder)
@@ -227,7 +228,6 @@ class SearchActivity : AppCompatActivity() {
         saveSongStack.onStop()
     }
 
-
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(EDITTEXT_TEXT, saveEditText)
         super.onSaveInstanceState(outState)
@@ -248,36 +248,20 @@ class SearchActivity : AppCompatActivity() {
 
     private fun search(text: String) {
         activityState(SearchActivityState.DOWNLOAD)
-        //appleService.search(text).execute()
-        appleService.search(text)
-            .enqueue(object : Callback<AppleSongResponce> {
-                override fun onResponse(
-                    call: Call<AppleSongResponce>,
-                    responce: Response<AppleSongResponce>
-                ) {
-                    when (responce.code()) {
-                        200 -> {
-                            if (responce.body()?.results?.isEmpty() == false) {
-                                appleSongList.clear()
-                                activityState(SearchActivityState.CLEARSTATE)
-                                appleSongList.addAll(responce.body()!!.results)
-                                Log.e("responce", responce.body()?.results.toString())
-                            } else {
-                                activityState(SearchActivityState.NOTHINGTOSHOW)
-                            }
-                        }
-
-                        else -> {
-                            activityState(SearchActivityState.DISCONNECTED)
-                        }
-
+        interactor.searchTrack(text, object : TrackInteractor.TrackConsumer {
+            override fun consume(foundTrack: List<Track>) {
+                runOnUiThread {
+                    appleSongList.clear()
+                    activityState(SearchActivityState.CLEARSTATE)
+                    appleSongList.addAll(foundTrack)
+                    trackListAdapter.notifyDataSetChanged()
+                    if (foundTrack.isNullOrEmpty()) {
+                        activityState(SearchActivityState.NOTHINGTOSHOW)
                     }
                 }
+            }
+        })
 
-                override fun onFailure(call: Call<AppleSongResponce>, t: Throwable) {
-                    activityState(SearchActivityState.DISCONNECTED)
-                }
-            })
     }
 
     private fun activityState(state: SearchActivityState) {
@@ -362,7 +346,7 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    private fun addSaveSongs(item: AppleSong) {
+    private fun addSaveSongs(item: Track) {
         if (saveSongStack.searchId(item)) {
             saveSongStack.remove(item)
         }

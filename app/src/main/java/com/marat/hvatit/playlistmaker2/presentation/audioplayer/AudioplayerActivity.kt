@@ -15,8 +15,8 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
-import com.marat.hvatit.playlistmaker2.data.network.AppleSong
 import com.marat.hvatit.playlistmaker2.R
+import com.marat.hvatit.playlistmaker2.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -90,7 +90,7 @@ class AudioplayerActivity : AppCompatActivity() {
         intent = getIntent()
 
         val song = intent.getStringExtra("Track")
-        val result: AppleSong = gson.fromJson(song, AppleSong::class.java)
+        val result: Track = gson.fromJson(song, Track::class.java)
         priviewUrl = result.priviewUrl
         Log.e("$TAG", result.toString())
         setTextContent(result)
@@ -102,7 +102,7 @@ class AudioplayerActivity : AppCompatActivity() {
 
     }
 
-    private fun setTextContent(song: AppleSong) {
+    private fun setTextContent(song: Track) {
         Glide.with(applicationContext)
             .load(song.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
             .placeholder(R.drawable.placeholder)

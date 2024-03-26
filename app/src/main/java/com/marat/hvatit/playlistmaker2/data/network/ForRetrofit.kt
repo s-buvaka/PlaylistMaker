@@ -1,18 +1,16 @@
 package com.marat.hvatit.playlistmaker2.data.network
 
 import com.google.gson.annotations.SerializedName
-import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Query
 
 
-class AppleSongResponce(val resultcount: Int, val results: ArrayList<AppleSong>) {
+/*
+class AppleSongResponce(val resultcount: Int, val results: ArrayList<Track>) {
     override fun toString(): String {
         return "AppleSongResponce(resultcount=$resultcount, results=$results)"
     }
 }
 
-data class AppleSong(
+data class Track(
     val trackId: String,
     val trackName: String,
     val artistName: String,
@@ -34,9 +32,4 @@ data class AppleSong(
         return "AppleSong(trackId='$trackId', trackName='$trackName', artistName='$artistName', trackTimeMills='$trackTimeMills', artworkUrl100='$artworkUrl100', country='$country', genre='$genre', year='$year', album='$album', priviewUrl='$priviewUrl')"
     }
 
-}
-
-interface AppleMusicAPI {
-    @GET("/search?entity=song")
-    fun search(@Query("term") text: String): Call<AppleSongResponce>
-}
+}*/

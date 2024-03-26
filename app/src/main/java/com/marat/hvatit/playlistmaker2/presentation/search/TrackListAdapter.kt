@@ -8,13 +8,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.marat.hvatit.playlistmaker2.data.network.AppleSong
 import com.marat.hvatit.playlistmaker2.R
+import com.marat.hvatit.playlistmaker2.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class TrackListAdapter(
-    private val tracklist: List<AppleSong>
+    private val tracklist: List<Track>
 ) : RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
     var saveTrackListener: SaveTrackListener? = null
 
@@ -35,7 +35,7 @@ class TrackListAdapter(
 
         }
 
-        fun bind(model: AppleSong) {
+        fun bind(model: Track) {
             trackName.text = model.trackName
             artistName.text = model.artistName
             trackTime.text = dateFormat(model.trackTimeMills)
@@ -70,7 +70,7 @@ class TrackListAdapter(
     }
 
     fun interface SaveTrackListener {
-        fun addTrack(item: AppleSong)
+        fun addTrack(item: Track)
 
     }
 }

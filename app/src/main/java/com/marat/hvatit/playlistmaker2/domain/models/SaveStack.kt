@@ -1,17 +1,13 @@
 package com.marat.hvatit.playlistmaker2.domain.models
 
 import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.marat.hvatit.playlistmaker2.data.dto.HistoryPref
 import com.marat.hvatit.playlistmaker2.data.dto.HistoryPrefImpl
-import com.marat.hvatit.playlistmaker2.data.network.AppleSong
 import java.util.Stack
 
-class SaveStack<T>(context: Context, private val maxSize: Int) : Stack<AppleSong>() {
+class SaveStack<T>(context: Context, private val maxSize: Int) : Stack<Track>() {
 
     private val historyPref = HistoryPrefImpl(context)
-    fun pushElement(item: AppleSong){
+    fun pushElement(item: Track){
         if(size>=maxSize){
             this.removeAt(this.size - 1)
         }
@@ -20,7 +16,7 @@ class SaveStack<T>(context: Context, private val maxSize: Int) : Stack<AppleSong
     }
 
 
-    fun searchId(item: AppleSong): Boolean {
+    fun searchId(item: Track): Boolean {
         for (i in this) {
             if (i.trackId == item.trackId) {
                 return true
@@ -35,17 +31,17 @@ class SaveStack<T>(context: Context, private val maxSize: Int) : Stack<AppleSong
         }
     }
 
-    fun getItemsFromCache(): List<AppleSong>? {
+    fun getItemsFromCache(): List<Track>? {
         return historyPref.getItemsFromCache()
     }
 
-    private fun saveItemsToCache(newItems: List<AppleSong>) {
+    private fun saveItemsToCache(newItems: List<Track>) {
         historyPref.saveItemsToCache(newItems)
     }
 
     fun interface SaveStackItemsListener {
         //Не успеваю реализовать, форсмажор
-        fun onItemsChanged(items: List<AppleSong>)
+        fun onItemsChanged(items: List<Track>)
     }
 
 }
