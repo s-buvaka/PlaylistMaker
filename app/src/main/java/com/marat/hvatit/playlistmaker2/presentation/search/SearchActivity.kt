@@ -23,16 +23,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import com.marat.hvatit.playlistmaker2.data.network.AppleMusicApiService
 import com.marat.hvatit.playlistmaker2.presentation.audioplayer.AudioplayerActivity
 import com.marat.hvatit.playlistmaker2.R
-import com.marat.hvatit.playlistmaker2.data.creator.Creator
+import com.marat.hvatit.playlistmaker2.creator.Creator
 import com.marat.hvatit.playlistmaker2.domain.api.TrackInteractor
 import com.marat.hvatit.playlistmaker2.domain.models.SaveStack
 import com.marat.hvatit.playlistmaker2.domain.models.Track
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
 
 const val EDITTEXT_TEXT = "EDITTEXT_TEXT"
 private const val TAG = "SearchActivity"
@@ -40,26 +37,14 @@ private lateinit var disconnected: String
 private lateinit var nothingToShow: String
 private lateinit var allfine: String
 
-enum class SearchActivityState {
-    DISCONNECTED, NOTHINGTOSHOW, ALLFINE, STARTSTATE, CLEARSTATE, DOWNLOAD
-}
-
 class SearchActivity : AppCompatActivity() {
 
     private var saveEditText: String = "error"
 
-    private val appleBaseUrl = "https://itunes.apple.com"
-
-    private val gson: Gson = Gson()
-
-    private val retrofit =
-        Retrofit.Builder().baseUrl(appleBaseUrl).addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-    private val appleService = retrofit.create(AppleMusicApiService::class.java)
 
     private val creator: Creator = Creator
     private val interactor = creator.provideTrackInteractor()
+    private val gson = creator.provideJsonParser()
 
 
     private lateinit var saveSongStack: SaveStack<Track>
@@ -91,13 +76,12 @@ class SearchActivity : AppCompatActivity() {
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
 
+    private lateinit var searchActivityState: SearchState
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        Log.e("activityState", "OnCreate")
-        Log.e("activityState", "${retrofit.hashCode()}")
-        Log.e("activityState", "${appleService.hashCode()}")
         val editText = findViewById<EditText>(R.id.editText)
         val buttonBack = findViewById<View>(R.id.back)
         val buttonClear: ImageButton = findViewById(R.id.buttonClear)
@@ -120,6 +104,7 @@ class SearchActivity : AppCompatActivity() {
         recyclerSongList.layoutManager = LinearLayoutManager(this)
         recyclerSongList.adapter = trackListAdapter
 
+
         if (savedInstanceState != null) {
             editText.setText(saveEditText)
         }
@@ -141,9 +126,23 @@ class SearchActivity : AppCompatActivity() {
                 if (s.isNullOrEmpty()) {
                     handler.removeCallbacks(searchRunnable)
                     if (saveSongStack.isEmpty()) {
-                        activityState(SearchActivityState.CLEARSTATE)
+                        searchActivityState = SearchState.ClearState(
+                            placeholder,
+                            buttonupdate,
+                            texterror,
+                            progressBar, clearHistory, historyText
+                        )
+                        activityState(searchActivityState)
                     } else {
-                        activityState(SearchActivityState.STARTSTATE)
+                        searchActivityState = SearchState.StartState(
+                            placeholder,
+                            buttonupdate,
+                            texterror,
+                            progressBar,
+                            clearHistory,
+                            historyText
+                        )
+                        activityState(searchActivityState)
                     }
                 } else {
                     searchText = s.toString()
@@ -164,14 +163,29 @@ class SearchActivity : AppCompatActivity() {
             editText.requestFocus()
             editText.setText("")
             (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
-                editText.windowToken,
-                0
+                editText.windowToken, 0
             )
-            //appleSongList.clear()
+
             if (saveSongStack.isEmpty()) {
-                activityState(SearchActivityState.CLEARSTATE)
+                searchActivityState = SearchState.ClearState(
+                    placeholder,
+                    buttonupdate,
+                    texterror,
+                    progressBar,
+                    clearHistory,
+                    historyText
+                )
+                activityState(searchActivityState)
             } else {
-                activityState(SearchActivityState.STARTSTATE)
+                searchActivityState = SearchState.StartState(
+                    placeholder,
+                    buttonupdate,
+                    texterror,
+                    progressBar,
+                    clearHistory,
+                    historyText
+                )
+                activityState(searchActivityState)
             }
             trackListAdapter.notifyDataSetChanged()
         }
@@ -188,7 +202,15 @@ class SearchActivity : AppCompatActivity() {
             if (hasFocus && !saveSongStack.isEmpty()) {
                 clearHistory.isVisible = true
                 historyText.isVisible = true
-                activityState(SearchActivityState.STARTSTATE)
+                searchActivityState = SearchState.StartState(
+                    placeholder,
+                    buttonupdate,
+                    texterror,
+                    progressBar,
+                    clearHistory,
+                    historyText
+                )
+                activityState(searchActivityState)
             } else {
                 clearHistory.isVisible = false
                 historyText.isGone = true
@@ -209,7 +231,7 @@ class SearchActivity : AppCompatActivity() {
                 addSaveSongs(it)
                 AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
                     .apply {
-                        putExtra("Track", gson.toJson(it))
+                        putExtra("Track", gson.objectToJson(it)/*toJson(it)*/)
                         startActivity(this)
                     }
             }
@@ -247,16 +269,41 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun search(text: String) {
-        activityState(SearchActivityState.DOWNLOAD)
+        searchActivityState = SearchState.Download(
+            placeholder,
+            buttonupdate,
+            texterror,
+            progressBar,
+            clearHistory,
+            historyText
+        )
+        activityState(searchActivityState)
         interactor.searchTrack(text, object : TrackInteractor.TrackConsumer {
             override fun consume(foundTrack: List<Track>) {
                 runOnUiThread {
                     appleSongList.clear()
-                    activityState(SearchActivityState.CLEARSTATE)
+                    searchActivityState = SearchState.ClearState(
+                        placeholder,
+                        buttonupdate,
+                        texterror,
+                        progressBar,
+                        clearHistory,
+                        historyText
+                    )
+                    activityState(searchActivityState)
                     appleSongList.addAll(foundTrack)
                     trackListAdapter.notifyDataSetChanged()
                     if (foundTrack.isNullOrEmpty()) {
-                        activityState(SearchActivityState.NOTHINGTOSHOW)
+                        searchActivityState = SearchState.NothingToShow(
+                            placeholder,
+                            buttonupdate,
+                            texterror,
+                            progressBar,
+                            clearHistory,
+                            historyText,
+                            nothingToShow
+                        )
+                        activityState(searchActivityState)
                     }
                 }
             }
@@ -264,82 +311,45 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    private fun activityState(state: SearchActivityState) {
-        //переделать на манер sealedClass
+    private fun activityState(state: SearchState) {
         when (state) {
-            SearchActivityState.DISCONNECTED -> {
+            is SearchState.AllFine -> {
+                state.setState()
+            }
+
+            is SearchState.ClearState -> {
                 appleSongList.clear()
-                placeholder.setImageResource(R.drawable.disconnect_problem)
-                placeholder.isVisible = true
-                buttonupdate.isVisible = true
-                texterror.text = disconnected
-                texterror.isVisible = true
-                clearHistory.isVisible = false
-                historyText.isVisible = false
-                progressBar.isVisible = false
-                Log.e("activityState", "DISCONNECTED")
+                state.setState()
             }
 
-            SearchActivityState.NOTHINGTOSHOW -> {
+            is SearchState.Disconnected -> {
                 appleSongList.clear()
-                placeholder.setImageResource(R.drawable.nothing_problem)
-                placeholder.isVisible = true
-                texterror.text = nothingToShow
-                texterror.isVisible = true
-                clearHistory.isVisible = false
-                historyText.isVisible = false
-                progressBar.isVisible = false
-                Log.e("activityState", "NOTHINGTOSHOW")
+                state.setState()
             }
 
-            SearchActivityState.ALLFINE -> {
-                buttonupdate.isVisible = false
-                placeholder.isVisible = false
-                texterror.isVisible = false
-                progressBar.isVisible = false
-                Log.e("activityState", "ALLFINE")
+            is SearchState.Download -> {
+                appleSongList.clear()
+                state.setState()
             }
 
-            SearchActivityState.STARTSTATE -> {
-                progressBar.isVisible = false
-                buttonupdate.isVisible = false
-                placeholder.isVisible = false
-                texterror.isVisible = false
-                getSaveSongs()
+            is SearchState.NothingToShow -> {
+                appleSongList.clear()
+                state.setState()
+            }
+
+            is SearchState.StartState -> {
+                setSavedTracks()
                 if (!saveSongStack.isEmpty()) {
                     clearHistory.isVisible = true
                     historyText.isVisible = true
                 }
-                Log.e("activityState", "STARTSTATE")
-            }
-
-            SearchActivityState.CLEARSTATE -> {
-                appleSongList.clear()
-                progressBar.isVisible = false
-                clearHistory.isGone = true
-                historyText.isGone = true
-                buttonupdate.isVisible = false
-                placeholder.isVisible = false
-                texterror.isVisible = false
-                trackListAdapter.notifyDataSetChanged()
-                Log.e("activityState", "CLEARSTATE")
-            }
-
-            SearchActivityState.DOWNLOAD -> {
-                appleSongList.clear()
-                progressBar.isVisible = true
-                clearHistory.isGone = true
-                historyText.isGone = true
-                buttonupdate.isVisible = false
-                placeholder.isVisible = false
-                texterror.isVisible = false
-                Log.e("activityState", "DOWNLOAD")
+                state.setState()
             }
         }
         trackListAdapter.notifyDataSetChanged()
     }
 
-    private fun getSaveSongs() {//изменить название
+    private fun setSavedTracks() {
         appleSongList.clear()
         appleSongList.addAll(saveSongStack)
         trackListAdapter.notifyDataSetChanged()

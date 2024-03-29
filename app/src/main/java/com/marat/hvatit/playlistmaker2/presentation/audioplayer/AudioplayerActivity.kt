@@ -2,7 +2,6 @@ package com.marat.hvatit.playlistmaker2.presentation.audioplayer
 
 import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -12,10 +11,10 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.gson.Gson
 import com.marat.hvatit.playlistmaker2.R
+import com.marat.hvatit.playlistmaker2.creator.Creator
+import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
+import com.marat.hvatit.playlistmaker2.domain.impl.AudioPlayerProvider
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -27,10 +26,9 @@ enum class MediaPlayerState {
     STATE_DEFAULT, STATE_PREPARED, STATE_PLAYING, STATE_PAUSED
 }
 
-class AudioplayerActivity : AppCompatActivity() {
+class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
 
     private lateinit var intent: Intent
-    private val gson: Gson = Gson()
     private val simpleDateFormat: SimpleDateFormat =
         SimpleDateFormat("mm:ss", Locale.getDefault())
 
@@ -43,18 +41,22 @@ class AudioplayerActivity : AppCompatActivity() {
     private lateinit var yearvalue: TextView
     private lateinit var albumvalue: TextView
     private lateinit var durationvalue: TextView
-
     private lateinit var artistName: TextView
     private lateinit var trackName: TextView
-
     private lateinit var buttonPlay: ImageButton
     private lateinit var priviewTimer: TextView
 
     private var playerState = MediaPlayerState.STATE_DEFAULT
-    private var mediaPlayer = MediaPlayer()
+
     private lateinit var priviewUrl: String
+
     private val handler = Handler(Looper.getMainLooper())
     private val timerRunnable: Runnable = Runnable { updateTimer() }
+
+    private val creator: Creator = Creator
+    private lateinit var interactor: AudioPlayerProvider
+    private val gson = creator.provideJsonParser()
+    private val glide = creator.provideGlideHelper()
 
 
     companion object {
@@ -69,7 +71,15 @@ class AudioplayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioplayer)
-
+        intent = getIntent()
+        val song = intent.getStringExtra("Track")
+        val result: Track = gson.jsonToObject(
+            song.toString(),
+            Track::class.java
+        )/*fromJson(song, Track::class.java)*/
+        priviewUrl = result.priviewUrl
+        interactor = creator.provideAudioPlayer(priviewUrl, this)
+        //..............................................................
         actplayerCover = findViewById(R.id.actplayer_cover)
         artistName = findViewById(R.id.actplayer_artist_name)
         trackName = findViewById(R.id.actplayer_track_name)
@@ -87,11 +97,6 @@ class AudioplayerActivity : AppCompatActivity() {
         buttonBack.setOnClickListener {
             onBackPressed()
         }
-        intent = getIntent()
-
-        val song = intent.getStringExtra("Track")
-        val result: Track = gson.fromJson(song, Track::class.java)
-        priviewUrl = result.priviewUrl
         Log.e("$TAG", result.toString())
         setTextContent(result)
         buttonPlay.isEnabled = false
@@ -103,11 +108,7 @@ class AudioplayerActivity : AppCompatActivity() {
     }
 
     private fun setTextContent(song: Track) {
-        Glide.with(applicationContext)
-            .load(song.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
-            .placeholder(R.drawable.placeholder)
-            .transform(RoundedCorners(roundedCornersImage))
-            .into(actplayerCover)
+        glide.actionWithGlide(applicationContext, song, roundedCornersImage, actplayerCover)
         durationvalue.setText(simpleDateFormat.format(song.trackTimeMills.toLong()))
         artistName.setText(song.artistName)
         trackName.setText(song.trackName)
@@ -118,79 +119,55 @@ class AudioplayerActivity : AppCompatActivity() {
         priviewTimer.text = "00:30"
     }
 
-    private fun preparePlayer(url: String) {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            buttonPlay.isEnabled = true
-            playerState = MediaPlayerState.STATE_PREPARED
-        }
-    }
-
-    private fun startPlayer() {
-        mediaPlayer.start()
-        updateTimer()
-        playerState = MediaPlayerState.STATE_PLAYING
-        buttonPlay.setBackgroundResource(R.drawable.button_stop)
-        mediaPlayer.setOnCompletionListener {
-            stopTimer()
-            priviewTimer.text = "00:00"
-            mediaPlayer.seekTo(0)
-            buttonPlay.setBackgroundResource(R.drawable.button_play)
-            playerState = MediaPlayerState.STATE_PREPARED
-
-        }
-    }
-
-    private fun pausePlayer() {
-        stopTimer()
-        mediaPlayer.pause()
-        playerState = MediaPlayerState.STATE_PAUSED
-        buttonPlay.setBackgroundResource(R.drawable.button_play)
-    }
-
-    private fun playbackControl() {
-        when (playerState) {
-            MediaPlayerState.STATE_PLAYING -> {
-                pausePlayer()
-            }
-            MediaPlayerState.STATE_PAUSED ->{
-                startPlayer()
-            }
-
-            MediaPlayerState.STATE_DEFAULT -> {
-                preparePlayer(priviewUrl)
-            }
-
-            MediaPlayerState.STATE_PREPARED -> {
-                startPlayer()
-            }
-        }
-    }
-
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        interactor.stopPlayer()
+        buttonPlay.setBackgroundResource(R.drawable.button_play)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(timerRunnable)
-        mediaPlayer.release()
+        interactor.destroyPlayer()
+    }
+
+    private fun playbackControl() {
+        playerState = interactor.playbackControl()
+        when (playerState) {
+            MediaPlayerState.STATE_PLAYING -> {
+                buttonPlay.setBackgroundResource(R.drawable.button_stop)
+                updateTimer()
+            }
+
+            MediaPlayerState.STATE_PAUSED -> {
+                buttonPlay.setBackgroundResource(R.drawable.button_play)
+                stopTimer()
+            }
+
+            MediaPlayerState.STATE_DEFAULT -> {
+                buttonPlay.setBackgroundResource(R.drawable.button_play)
+                buttonPlay.isEnabled = true
+            }
+
+            MediaPlayerState.STATE_PREPARED -> {
+                buttonPlay.setBackgroundResource(R.drawable.button_play)
+
+            }
+        }
     }
 
     private fun updateTimer() {
-        stopTimer()
-        priviewTimer.text =
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+        priviewTimer.text = interactor.updateTimer()
         handler.postDelayed(timerRunnable, 1000L)
-        //Log.e("timerAudio", "Timer:${mediaPlayer.currentPosition/1000}")
-        //Log.e("StateAudioPlayer","${mediaPlayer.currentPosition/1000}+/+${priviewTimer.text}")
-        //Log.e("AudioPlayerHash",mediaPlayer.hashCode().toString())
     }
 
-    private fun stopTimer(){
+    private fun stopTimer() {
         handler.removeCallbacks(timerRunnable)
+    }
+
+    override fun trackIsDone() {
+        stopTimer()
+        priviewTimer.text = "00:00"
     }
 
 }

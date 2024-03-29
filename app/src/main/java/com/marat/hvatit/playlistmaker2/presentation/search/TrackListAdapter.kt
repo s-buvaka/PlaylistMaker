@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.marat.hvatit.playlistmaker2.R
+import com.marat.hvatit.playlistmaker2.creator.Creator
+import com.marat.hvatit.playlistmaker2.domain.impl.GlideProvider
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -17,8 +17,9 @@ class TrackListAdapter(
     private val tracklist: List<Track>
 ) : RecyclerView.Adapter<TrackListAdapter.TrackViewHolder>() {
     var saveTrackListener: SaveTrackListener? = null
+    private val creator: Creator = Creator
 
-    class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class TrackViewHolder(itemView: View,val glide:GlideProvider) : RecyclerView.ViewHolder(itemView) {
         private val trackName: TextView
         private val artistName: TextView
         private val trackTime: TextView
@@ -39,16 +40,12 @@ class TrackListAdapter(
             trackName.text = model.trackName
             artistName.text = model.artistName
             trackTime.text = dateFormat(model.trackTimeMills)
-            Glide.with(itemView.context)
-                .load(model.artworkUrl100)
-                .placeholder(R.drawable.placeholder)
-                .transform(RoundedCorners(roundedCornersImage))
-                .into(trackImage)
-
+            glide.actionWithGlide(itemView.context,model,roundedCornersImage,trackImage)
         }
 
+
+
         private fun dateFormat(trackTime: String): String {
-            //SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMills.toLong())
             return simpleDateFormat.format(trackTime.toLong())
         }
 
@@ -56,7 +53,7 @@ class TrackListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.search_cell, parent, false)
-        return TrackViewHolder(view as ViewGroup)
+        return TrackViewHolder(view as ViewGroup,creator.provideGlideHelper())
     }
 
     override fun getItemCount() = tracklist.size
