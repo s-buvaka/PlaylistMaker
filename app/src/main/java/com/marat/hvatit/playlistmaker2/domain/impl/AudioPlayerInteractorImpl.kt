@@ -2,23 +2,24 @@ package com.marat.hvatit.playlistmaker2.domain.impl
 
 
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerRepository
 import com.marat.hvatit.playlistmaker2.presentation.audioplayer.MediaPlayerState
 
-class AudioPlayerProvider(private val audioPlayerImpl: AudioPlayerInteractor)  {
+class AudioPlayerInteractorImpl(private val audioPlayerImpl: AudioPlayerRepository) : AudioPlayerInteractor  {
 
-     fun playbackControl(): MediaPlayerState {
+     override fun playbackControl(): MediaPlayerState {
         return audioPlayerImpl.stateControl()
     }
 
-     fun updateTimer(): String {
+    override fun updateTimer(): String {
         return audioPlayerImpl.getCurrentTime()
     }
 
-     fun destroyPlayer() {
+    override fun destroyPlayer() {
         audioPlayerImpl.destroyActivity()
     }
 
-     fun stopPlayer(){
+    override fun stopPlayer(){
         audioPlayerImpl.pauseActivity()
     }
 

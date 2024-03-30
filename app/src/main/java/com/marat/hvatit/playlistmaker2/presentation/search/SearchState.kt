@@ -12,12 +12,16 @@ interface Performable {
     fun setState()
 }
 
-sealed class SearchState() {
+sealed class SearchState : Performable {
     //DISCONNECTED, NOTHINGTOSHOW, ALLFINE, STARTSTATE, CLEARSTATE, DOWNLOAD
     abstract val placeholder: ImageView
     abstract val buttonUpdate: ImageButton
     abstract val textError: TextView
     abstract val progressBar: ProgressBar
+
+    override fun setState() {
+
+    }
 
     class Disconnected(
         override val placeholder: ImageView,
@@ -29,7 +33,7 @@ sealed class SearchState() {
         val message: String
     ) : SearchState(
 
-    ), Performable {
+    ) {
         override fun setState() {
             placeholder.setImageResource(R.drawable.disconnect_problem)
             placeholder.isVisible = true
@@ -51,9 +55,7 @@ sealed class SearchState() {
         val buttonClearHistory: ImageButton,
         val textHistory: TextView,
         val message: String
-    ) : SearchState(
-
-    ), Performable {
+    ) : SearchState() {
         override fun setState() {
             placeholder.setImageResource(R.drawable.nothing_problem)
             placeholder.isVisible = true
@@ -72,7 +74,7 @@ sealed class SearchState() {
         override val progressBar: ProgressBar,
         val buttonClearHistory: ImageButton,
         val textHistory: TextView
-    ) : SearchState(), Performable {
+    ) : SearchState() {
         override fun setState() {
             progressBar.isVisible = false
             buttonUpdate.isVisible = false
@@ -91,7 +93,7 @@ sealed class SearchState() {
         override val progressBar: ProgressBar,
         val buttonClearHistory: ImageButton,
         val textHistory: TextView
-    ) : SearchState(), Performable {
+    ) : SearchState() {
         override fun setState() {
             progressBar.isVisible = false
             buttonClearHistory.isGone = true
@@ -107,7 +109,7 @@ sealed class SearchState() {
         override val buttonUpdate: ImageButton,
         override val textError: TextView,
         override val progressBar: ProgressBar
-    ) : SearchState(), Performable {
+    ) : SearchState() {
         override fun setState() {
             buttonUpdate.isVisible = false
             placeholder.isVisible = false
@@ -123,7 +125,7 @@ sealed class SearchState() {
         override val progressBar: ProgressBar,
         val buttonClearHistory: ImageButton,
         val textHistory: TextView
-    ) : SearchState(), Performable {
+    ) : SearchState() {
         override fun setState() {
             progressBar.isVisible = true
             buttonClearHistory.isGone = true

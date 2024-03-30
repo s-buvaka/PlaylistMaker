@@ -2,13 +2,13 @@ package com.marat.hvatit.playlistmaker2.data
 
 import android.media.MediaPlayer
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
-import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerRepository
 import com.marat.hvatit.playlistmaker2.presentation.audioplayer.MediaPlayerState
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class AudioPlayerImpl(private val priviewUrl: String,private val activityCallBack: AudioPlayerCallback) :
-    AudioPlayerInteractor {
+class AudioPlayerRepositoryImpl(private val priviewUrl: String, private val activityCallBack: AudioPlayerCallback) :
+    AudioPlayerRepository {
 
 
     private var mediaPlayer = MediaPlayer()

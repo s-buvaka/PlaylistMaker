@@ -14,7 +14,7 @@ import android.widget.TextView
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.creator.Creator
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
-import com.marat.hvatit.playlistmaker2.domain.impl.AudioPlayerProvider
+import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -54,7 +54,7 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
     private val timerRunnable: Runnable = Runnable { updateTimer() }
 
     private val creator: Creator = Creator
-    private lateinit var interactor: AudioPlayerProvider
+    private lateinit var interactor: AudioPlayerInteractor
     private val gson = creator.provideJsonParser()
     private val glide = creator.provideGlideHelper()
 
@@ -108,7 +108,7 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
     }
 
     private fun setTextContent(song: Track) {
-        glide.actionWithGlide(applicationContext, song, roundedCornersImage, actplayerCover)
+        glide.setImage(applicationContext, song, roundedCornersImage, actplayerCover)
         durationvalue.setText(simpleDateFormat.format(song.trackTimeMills.toLong()))
         artistName.setText(song.artistName)
         trackName.setText(song.trackName)

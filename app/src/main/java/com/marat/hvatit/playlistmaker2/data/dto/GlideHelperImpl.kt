@@ -5,7 +5,7 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.marat.hvatit.playlistmaker2.R
-import com.marat.hvatit.playlistmaker2.domain.api.GlideHelper
+import com.marat.hvatit.playlistmaker2.presentation.utils.GlideHelper
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 
 class GlideHelperImpl : GlideHelper {
