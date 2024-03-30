@@ -1,12 +1,12 @@
-package com.marat.hvatit.playlistmaker2.data.dto
+package com.marat.hvatit.playlistmaker2.common
 
 import android.content.Context
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.marat.hvatit.playlistmaker2.R
-import com.marat.hvatit.playlistmaker2.presentation.utils.GlideHelper
 import com.marat.hvatit.playlistmaker2.domain.models.Track
+import com.marat.hvatit.playlistmaker2.presentation.utils.GlideHelper
 
 class GlideHelperImpl : GlideHelper {
 

@@ -2,8 +2,8 @@ package com.marat.hvatit.playlistmaker2.creator
 
 import com.marat.hvatit.playlistmaker2.data.AudioPlayerRepositoryImpl
 import com.marat.hvatit.playlistmaker2.data.TrackRepositoryImpl
-import com.marat.hvatit.playlistmaker2.data.dto.GlideHelperImpl
-import com.marat.hvatit.playlistmaker2.data.dto.GsonHelperImpl
+import com.marat.hvatit.playlistmaker2.common.GlideHelperImpl
+import com.marat.hvatit.playlistmaker2.data.dto.JsonParserImpl
 import com.marat.hvatit.playlistmaker2.data.network.RetrofitNetworkClient
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
@@ -27,8 +27,8 @@ object Creator {
         return AudioPlayerInteractorImpl(AudioPlayerRepositoryImpl(priviewUrl, callback))
     }
 
-    fun provideJsonParser(): GsonHelperImpl {
-        return GsonHelperImpl()
+    fun provideJsonParser(): JsonParserImpl {
+        return JsonParserImpl()
     }
 
     fun provideGlideHelper(): GlideHelper {
