@@ -21,14 +21,14 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.marat.hvatit.playlistmaker2.presentation.audioplayer.AudioplayerActivity
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.creator.Creator
-import com.marat.hvatit.playlistmaker2.domain.api.TrackInteractor
 import com.marat.hvatit.playlistmaker2.domain.models.SaveStack
 import com.marat.hvatit.playlistmaker2.domain.models.Track
+import com.marat.hvatit.playlistmaker2.presentation.audioplayer.AudioplayerActivity
 
 
 const val EDITTEXT_TEXT = "EDITTEXT_TEXT"
@@ -49,7 +49,7 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var saveSongStack: SaveStack<Track>
     private val appleSongList = ArrayList<Track>()
-    private val trackListAdapter = TrackListAdapter(appleSongList)
+    private val trackListAdapter = TrackListAdapter()
 
     private lateinit var placeholder: ImageView
     private lateinit var texterror: TextView
@@ -71,12 +71,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private var searchText: String? = null
-    private val searchRunnable: Runnable = Runnable { searchText?.let { search(it) } }
+    private val searchRunnable: Runnable =
+        Runnable { searchText?.let { viewModel.search(it) } }
 
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
 
-    private lateinit var searchActivityState: SearchState
+    private lateinit var viewModel: SearchViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +92,7 @@ class SearchActivity : AppCompatActivity() {
         clearHistory = findViewById(R.id.clearhistory)
         progressBar = findViewById(R.id.progressBar)
 
+
         saveSongStack = SaveStack<Track>(applicationContext, 10)
         saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
         //...............................................................
@@ -103,6 +105,16 @@ class SearchActivity : AppCompatActivity() {
         //...............................................................
         recyclerSongList.layoutManager = LinearLayoutManager(this)
         recyclerSongList.adapter = trackListAdapter
+
+        viewModel = ViewModelProvider(this, SearchViewModel.getViewModelFactory(interactor)).get(
+            SearchViewModel::class.java
+        )/*[SearchViewModel::class.java]*/
+        viewModel.addSearchObserver { searchState ->
+            runOnUiThread {
+                onState(searchState)
+            }
+        }
+
 
 
         if (savedInstanceState != null) {
@@ -126,23 +138,9 @@ class SearchActivity : AppCompatActivity() {
                 if (s.isNullOrEmpty()) {
                     handler.removeCallbacks(searchRunnable)
                     if (saveSongStack.isEmpty()) {
-                        searchActivityState = SearchState.ClearState(
-                            placeholder,
-                            buttonupdate,
-                            texterror,
-                            progressBar, clearHistory, historyText
-                        )
-                        activityState(searchActivityState)
+                        viewModel.changeState(SearchState.ClearState)
                     } else {
-                        searchActivityState = SearchState.StartState(
-                            placeholder,
-                            buttonupdate,
-                            texterror,
-                            progressBar,
-                            clearHistory,
-                            historyText
-                        )
-                        activityState(searchActivityState)
+                        viewModel.changeState(SearchState.StartState)
                     }
                 } else {
                     searchText = s.toString()
@@ -167,25 +165,9 @@ class SearchActivity : AppCompatActivity() {
             )
 
             if (saveSongStack.isEmpty()) {
-                searchActivityState = SearchState.ClearState(
-                    placeholder,
-                    buttonupdate,
-                    texterror,
-                    progressBar,
-                    clearHistory,
-                    historyText
-                )
-                activityState(searchActivityState)
+                viewModel.changeState(SearchState.ClearState)
             } else {
-                searchActivityState = SearchState.StartState(
-                    placeholder,
-                    buttonupdate,
-                    texterror,
-                    progressBar,
-                    clearHistory,
-                    historyText
-                )
-                activityState(searchActivityState)
+                viewModel.changeState(SearchState.StartState)
             }
             trackListAdapter.notifyDataSetChanged()
         }
@@ -193,7 +175,8 @@ class SearchActivity : AppCompatActivity() {
         editText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 handler.removeCallbacks(searchRunnable)
-                search(editText.text.toString())
+                viewModel.search(editText.text.toString())
+                //search(editText.text.toString())
             }
             false
         }
@@ -202,15 +185,7 @@ class SearchActivity : AppCompatActivity() {
             if (hasFocus && !saveSongStack.isEmpty()) {
                 clearHistory.isVisible = true
                 historyText.isVisible = true
-                searchActivityState = SearchState.StartState(
-                    placeholder,
-                    buttonupdate,
-                    texterror,
-                    progressBar,
-                    clearHistory,
-                    historyText
-                )
-                activityState(searchActivityState)
+                viewModel.changeState(SearchState.StartState)
             } else {
                 clearHistory.isVisible = false
                 historyText.isGone = true
@@ -238,10 +213,84 @@ class SearchActivity : AppCompatActivity() {
         }
 
         buttonupdate.setOnClickListener {
-            search(editText.text.toString())
+            viewModel.search(editText.text.toString())
         }
 
 
+    }
+
+    private fun onState(searchState: SearchState) {
+        when (searchState) {
+            is SearchState.AllFine -> {
+                buttonupdate.isVisible = false
+                placeholder.isVisible = false
+                texterror.isVisible = false
+                progressBar.isVisible = false
+            }
+
+            is SearchState.ClearState -> {
+                buttonupdate.isVisible = false
+                placeholder.isVisible = false
+                texterror.isVisible = false
+
+                clearHistory.isVisible = false
+                historyText.isVisible = false
+                progressBar.isVisible = false
+            }
+
+            is SearchState.Data -> {
+                trackListAdapter.update(searchState.foundTrack)
+
+                placeholder.isVisible = false
+                buttonupdate.isVisible = false
+                texterror.isVisible = false
+                progressBar.isVisible = false
+            }
+
+            is SearchState.Disconnected -> {
+                placeholder.setImageResource(R.drawable.disconnect_problem)
+                placeholder.isVisible = true
+                buttonupdate.isVisible = true
+                texterror.text = applicationContext.getString(searchState.message)
+                texterror.isVisible = true
+
+                clearHistory.isVisible = false
+                historyText.isVisible = false
+                progressBar.isVisible = false
+            }
+
+            is SearchState.Download -> {
+                buttonupdate.isVisible = false
+                placeholder.isVisible = false
+                texterror.isVisible = false
+
+                clearHistory.isVisible = false
+                historyText.isVisible = false
+                progressBar.isVisible = true
+            }
+
+            is SearchState.NothingToShow -> {
+                placeholder.setImageResource(R.drawable.nothing_problem)
+                placeholder.isVisible = true
+                texterror.text = applicationContext.getString(searchState.message)
+                texterror.isVisible = true
+
+                clearHistory.isVisible = false
+                historyText.isVisible = false
+                progressBar.isVisible = false
+            }
+
+            is SearchState.StartState -> {
+                placeholder.isVisible = false
+                buttonupdate.isVisible = false
+                texterror.isVisible = false
+                progressBar.isVisible = false
+                setSavedTracks()
+                Log.e("SongList","appleSongList:$appleSongList")
+                Log.e("SongList","saveSongStack:$saveSongStack")
+            }
+        }
+        trackListAdapter.notifyDataSetChanged()
     }
 
     override fun onStop() {
@@ -267,93 +316,15 @@ class SearchActivity : AppCompatActivity() {
             ImageButton.VISIBLE
         }
     }
-
-    private fun search(text: String) {
-        searchActivityState = SearchState.Download(
-            placeholder,
-            buttonupdate,
-            texterror,
-            progressBar,
-            clearHistory,
-            historyText
-        )
-        activityState(searchActivityState)
-        interactor.searchTrack(text, object : TrackInteractor.TrackConsumer {
-            override fun consume(foundTrack: List<Track>) {
-                runOnUiThread {
-                    appleSongList.clear()
-                    searchActivityState = SearchState.ClearState(
-                        placeholder,
-                        buttonupdate,
-                        texterror,
-                        progressBar,
-                        clearHistory,
-                        historyText
-                    )
-                    activityState(searchActivityState)
-                    appleSongList.addAll(foundTrack)
-                    trackListAdapter.notifyDataSetChanged()
-                    if (foundTrack.isNullOrEmpty()) {
-                        searchActivityState = SearchState.NothingToShow(
-                            placeholder,
-                            buttonupdate,
-                            texterror,
-                            progressBar,
-                            clearHistory,
-                            historyText,
-                            nothingToShow
-                        )
-                        activityState(searchActivityState)
-                    }
-                }
-            }
-        })
-
-    }
-
-    private fun activityState(state: SearchState) {
-        when (state) {
-            is SearchState.AllFine -> {
-                state.setState()
-            }
-
-            is SearchState.ClearState -> {
-                appleSongList.clear()
-                state.setState()
-            }
-
-            is SearchState.Disconnected -> {
-                appleSongList.clear()
-                state.setState()
-            }
-
-            is SearchState.Download -> {
-                appleSongList.clear()
-                state.setState()
-            }
-
-            is SearchState.NothingToShow -> {
-                appleSongList.clear()
-                state.setState()
-            }
-
-            is SearchState.StartState -> {
-                setSavedTracks()
-                if (!saveSongStack.isEmpty()) {
-                    clearHistory.isVisible = true
-                    historyText.isVisible = true
-                }
-                state.setState()
-            }
-        }
-        trackListAdapter.notifyDataSetChanged()
-    }
-
     private fun setSavedTracks() {
-        appleSongList.clear()
-        appleSongList.addAll(saveSongStack)
+        if (saveSongStack.isEmpty()) {
+            clearHistory.isVisible = false
+            historyText.isVisible = false
+        }
+        clearHistory.isVisible = true
+        historyText.isVisible = true
+        trackListAdapter.update(saveSongStack)
         trackListAdapter.notifyDataSetChanged()
-
     }
 
     private fun addSaveSongs(item: Track) {

@@ -8,10 +8,11 @@ import com.marat.hvatit.playlistmaker2.creator.Creator
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 
 class TrackListAdapter(
-    private val tracklist: List<Track>
 ) : RecyclerView.Adapter<TrackViewHolder>() {
     var saveTrackListener: SaveTrackListener? = null
     private val creator: Creator = Creator
+
+    private var tracklist : List<Track> = emptyList()
 
 
 
@@ -28,6 +29,11 @@ class TrackListAdapter(
         holder.itemView.setOnClickListener {
             saveTrackListener?.addTrack(item)
         }
+    }
+
+    fun update(trackList : List<Track>){
+        this.tracklist = trackList
+        //notifyDataSetChanged()
     }
 
     fun interface SaveTrackListener {
