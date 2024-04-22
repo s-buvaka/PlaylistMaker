@@ -25,13 +25,14 @@ class SaveStack<T>(context: Context, private val maxSize: Int) : Stack<Track>() 
         return false
     }
 
-    fun onStop() {
-        this?.also {
+    fun onDestroyStack() {
+        this.also {
             saveItemsToCache(it)
         }
     }
 
     fun getItemsFromCache(): List<Track>? {
+        //Log.e("saveSongStack", "getSaveTracks:${historyPref.getItemsFromCache()}")
         return historyPref.getItemsFromCache()
     }
 

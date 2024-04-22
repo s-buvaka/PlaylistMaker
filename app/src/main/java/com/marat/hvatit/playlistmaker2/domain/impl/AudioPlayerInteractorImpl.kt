@@ -5,9 +5,10 @@ import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerRepository
 import com.marat.hvatit.playlistmaker2.presentation.audioplayer.MediaPlayerState
 
-class AudioPlayerInteractorImpl(private val audioPlayerImpl: AudioPlayerRepository) : AudioPlayerInteractor  {
+class AudioPlayerInteractorImpl(private val audioPlayerImpl: AudioPlayerRepository) :
+    AudioPlayerInteractor {
 
-     override fun playbackControl(): MediaPlayerState {
+    override fun playbackControl(): MediaPlayerState {
         return audioPlayerImpl.stateControl()
     }
 
@@ -19,7 +20,7 @@ class AudioPlayerInteractorImpl(private val audioPlayerImpl: AudioPlayerReposito
         audioPlayerImpl.destroyActivity()
     }
 
-    override fun stopPlayer(){
+    override fun stopPlayer() {
         audioPlayerImpl.pauseActivity()
     }
 

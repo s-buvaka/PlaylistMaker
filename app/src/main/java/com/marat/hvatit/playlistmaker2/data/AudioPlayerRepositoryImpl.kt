@@ -7,7 +7,10 @@ import com.marat.hvatit.playlistmaker2.presentation.audioplayer.MediaPlayerState
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class AudioPlayerRepositoryImpl(private val priviewUrl: String, private val activityCallBack: AudioPlayerCallback) :
+class AudioPlayerRepositoryImpl(
+    private val priviewUrl: String,
+    private val activityCallBack: AudioPlayerCallback
+) :
     AudioPlayerRepository {
 
 

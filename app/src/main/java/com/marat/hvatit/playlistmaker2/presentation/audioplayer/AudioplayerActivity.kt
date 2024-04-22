@@ -2,7 +2,6 @@ package com.marat.hvatit.playlistmaker2.presentation.audioplayer
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +10,8 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.creator.Creator
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
@@ -46,7 +47,7 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
     private lateinit var buttonPlay: ImageButton
     private lateinit var priviewTimer: TextView
 
-    private var playerState = MediaPlayerState.STATE_DEFAULT
+    //private var playerState = MediaPlayerState.STATE_DEFAULT
 
     private lateinit var priviewUrl: String
 
@@ -57,6 +58,7 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
     private lateinit var interactor: AudioPlayerInteractor
     private val gson = creator.provideJsonParser()
     private val glide = creator.provideGlideHelper()
+    private lateinit var viewModel: AudioViewModel
 
 
     companion object {
@@ -79,6 +81,10 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
         )/*fromJson(song, Track::class.java)*/
         priviewUrl = result.priviewUrl
         interactor = creator.provideAudioPlayer(priviewUrl, this)
+        viewModel = ViewModelProvider(
+            this,
+            AudioViewModel.getViewModelFactory(interactor)
+        )[AudioViewModel::class.java]
         //..............................................................
         actplayerCover = findViewById(R.id.actplayer_cover)
         artistName = findViewById(R.id.actplayer_artist_name)
@@ -100,6 +106,7 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
         Log.e("$TAG", result.toString())
         setTextContent(result)
         buttonPlay.isEnabled = false
+
         playbackControl()
         buttonPlay.setOnClickListener {
             playbackControl()
@@ -121,19 +128,22 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
 
     override fun onPause() {
         super.onPause()
-        interactor.stopPlayer()
+        //interactor.stopPlayer()
+        viewModel.stopPlayer()
         buttonPlay.setBackgroundResource(R.drawable.button_play)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacks(timerRunnable)
-        interactor.destroyPlayer()
+        //interactor.destroyPlayer()
+        viewModel.destroyPlayer()
     }
 
     private fun playbackControl() {
-        playerState = interactor.playbackControl()
-        when (playerState) {
+        //playerState = interactor.playbackControl()
+        //viewModel.playbackControl()
+        when (viewModel.playbackControl()) {
             MediaPlayerState.STATE_PLAYING -> {
                 buttonPlay.setBackgroundResource(R.drawable.button_stop)
                 updateTimer()
@@ -157,7 +167,8 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
     }
 
     private fun updateTimer() {
-        priviewTimer.text = interactor.updateTimer()
+        //priviewTimer.text = interactor.updateTimer()
+        priviewTimer.text = viewModel.updateTimer()
         handler.postDelayed(timerRunnable, 1000L)
     }
 

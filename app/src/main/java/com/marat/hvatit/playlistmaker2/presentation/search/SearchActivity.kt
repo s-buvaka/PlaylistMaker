@@ -33,9 +33,6 @@ import com.marat.hvatit.playlistmaker2.presentation.audioplayer.AudioplayerActiv
 
 const val EDITTEXT_TEXT = "EDITTEXT_TEXT"
 private const val TAG = "SearchActivity"
-private lateinit var disconnected: String
-private lateinit var nothingToShow: String
-private lateinit var allfine: String
 
 class SearchActivity : AppCompatActivity() {
 
@@ -45,10 +42,9 @@ class SearchActivity : AppCompatActivity() {
     private val creator: Creator = Creator
     private val interactor = creator.provideTrackInteractor()
     private val gson = creator.provideJsonParser()
-
-
     private lateinit var saveSongStack: SaveStack<Track>
-    private val appleSongList = ArrayList<Track>()
+
+
     private val trackListAdapter = TrackListAdapter()
 
     private lateinit var placeholder: ImageView
@@ -91,36 +87,44 @@ class SearchActivity : AppCompatActivity() {
         historyText = findViewById(R.id.messagehistory)
         clearHistory = findViewById(R.id.clearhistory)
         progressBar = findViewById(R.id.progressBar)
-
-
-        saveSongStack = SaveStack<Track>(applicationContext, 10)
-        saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
         //...............................................................
         placeholder = findViewById(R.id.activity_search_placeholder)
         texterror = findViewById(R.id.activity_search_texterror)
         buttonupdate = findViewById(R.id.activity_search_update)
-        disconnected = applicationContext.getString(R.string.act_search_disconnect)
-        nothingToShow = applicationContext.getString(R.string.act_search_nothing)
-        allfine = applicationContext.getString(R.string.act_search_fine)
         //...............................................................
         recyclerSongList.layoutManager = LinearLayoutManager(this)
         recyclerSongList.adapter = trackListAdapter
 
-        viewModel = ViewModelProvider(this, SearchViewModel.getViewModelFactory(interactor)).get(
-            SearchViewModel::class.java
-        )/*[SearchViewModel::class.java]*/
+        saveSongStack = creator.provideSaveStack( 10)
+        viewModel = ViewModelProvider(
+            this,
+            SearchViewModel.getViewModelFactory(interactor, saveSongStack)
+        )[SearchViewModel::class.java]
+        //get(SearchViewModel::class.java)
         viewModel.addSearchObserver { searchState ->
             runOnUiThread {
                 onState(searchState)
             }
         }
 
-
-
         if (savedInstanceState != null) {
             editText.setText(saveEditText)
         }
         //..............................................................
+
+        editText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && !viewModel.isEmptyStack()) {
+                trackListAdapter.update(viewModel.getSaveTracks())
+                viewModel.changeState(SearchState.StartState)
+                //попал только в он фокус и список всё
+            } else {
+                viewModel.changeState(SearchState.ClearState)
+                /*trackListAdapter.update(viewModel.getSaveTracks())
+                viewModel.changeState(SearchState.StartState)*/
+
+            }
+        }
+
         val simpletextWatcher = object : TextWatcher {
             @RequiresApi(Build.VERSION_CODES.Q)
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -128,23 +132,20 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                Log.e("activityState", "2")
                 clearButtonVisibility(s).also { buttonClear.visibility = it }
             }
 
             override fun afterTextChanged(s: Editable?) {
-                Log.e("activityState", "3")
                 saveEditText = s.toString()
                 if (s.isNullOrEmpty()) {
                     handler.removeCallbacks(searchRunnable)
-                    if (saveSongStack.isEmpty()) {
+                    if (viewModel.isEmptyStack()) {
                         viewModel.changeState(SearchState.ClearState)
                     } else {
                         viewModel.changeState(SearchState.StartState)
                     }
                 } else {
                     searchText = s.toString()
-                    Log.e("activityState", "${searchText}")
                     searchDebounce()
                 }
             }
@@ -163,8 +164,7 @@ class SearchActivity : AppCompatActivity() {
             (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
                 editText.windowToken, 0
             )
-
-            if (saveSongStack.isEmpty()) {
+            if (viewModel.isEmptyStack()) {
                 viewModel.changeState(SearchState.ClearState)
             } else {
                 viewModel.changeState(SearchState.StartState)
@@ -181,29 +181,18 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        editText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && !saveSongStack.isEmpty()) {
-                clearHistory.isVisible = true
-                historyText.isVisible = true
-                viewModel.changeState(SearchState.StartState)
-            } else {
-                clearHistory.isVisible = false
-                historyText.isGone = true
-            }
-        }
-
         clearHistory.setOnClickListener {
-            saveSongStack.clear()
-            appleSongList.clear()
-            trackListAdapter.notifyDataSetChanged()
             clearHistory.isGone = true
             historyText.isGone = true
-            saveSongStack.onStop()
+
+            viewModel.clearSaveStack()
+            trackListAdapter.update(emptyList())
+            trackListAdapter.notifyDataSetChanged()
         }
 
         trackListAdapter.saveTrackListener = TrackListAdapter.SaveTrackListener {
             if (clickDebounce()) {
-                addSaveSongs(it)
+                viewModel.addSaveSongs(it)
                 AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
                     .apply {
                         putExtra("Track", gson.objectToJson(it)/*toJson(it)*/)
@@ -229,6 +218,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             is SearchState.ClearState -> {
+                trackListAdapter.update(emptyList())
                 buttonupdate.isVisible = false
                 placeholder.isVisible = false
                 texterror.isVisible = false
@@ -245,14 +235,19 @@ class SearchActivity : AppCompatActivity() {
                 buttonupdate.isVisible = false
                 texterror.isVisible = false
                 progressBar.isVisible = false
+
+                clearHistory.isVisible = false
+                historyText.isVisible = false
             }
 
             is SearchState.Disconnected -> {
+                trackListAdapter.update(emptyList())
                 placeholder.setImageResource(R.drawable.disconnect_problem)
                 placeholder.isVisible = true
                 buttonupdate.isVisible = true
                 texterror.text = applicationContext.getString(searchState.message)
                 texterror.isVisible = true
+
 
                 clearHistory.isVisible = false
                 historyText.isVisible = false
@@ -260,6 +255,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             is SearchState.Download -> {
+                trackListAdapter.update(emptyList())
                 buttonupdate.isVisible = false
                 placeholder.isVisible = false
                 texterror.isVisible = false
@@ -270,6 +266,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             is SearchState.NothingToShow -> {
+                trackListAdapter.update(emptyList())
                 placeholder.setImageResource(R.drawable.nothing_problem)
                 placeholder.isVisible = true
                 texterror.text = applicationContext.getString(searchState.message)
@@ -285,9 +282,10 @@ class SearchActivity : AppCompatActivity() {
                 buttonupdate.isVisible = false
                 texterror.isVisible = false
                 progressBar.isVisible = false
-                setSavedTracks()
-                Log.e("SongList","appleSongList:$appleSongList")
-                Log.e("SongList","saveSongStack:$saveSongStack")
+                getSavedTracksAct()
+
+                clearHistory.isVisible = true
+                historyText.isVisible = true
             }
         }
         trackListAdapter.notifyDataSetChanged()
@@ -295,8 +293,17 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+        //viewModel.removeSearchStateObservers()
         handler.removeCallbacks(searchRunnable)
-        saveSongStack.onStop()
+        Log.e("SaveTracks", "${viewModel.getSaveTracks()}")
+        viewModel.setSaveTracks()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //viewModel.removeSearchStateObservers()
+        Log.e("SaveTracks", "${viewModel.getSaveTracks()}")
+        viewModel.setSaveTracks()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -316,23 +323,19 @@ class SearchActivity : AppCompatActivity() {
             ImageButton.VISIBLE
         }
     }
-    private fun setSavedTracks() {
-        if (saveSongStack.isEmpty()) {
+
+    private fun getSavedTracksAct() {
+        if (viewModel.isEmptyStack()) {
             clearHistory.isVisible = false
             historyText.isVisible = false
         }
         clearHistory.isVisible = true
         historyText.isVisible = true
-        trackListAdapter.update(saveSongStack)
+        trackListAdapter.update(viewModel.getSaveTracks())
+        Log.e("saveSongStack", "setSavedTracks:${viewModel.getSaveTracks()}")
         trackListAdapter.notifyDataSetChanged()
     }
 
-    private fun addSaveSongs(item: Track) {
-        if (saveSongStack.searchId(item)) {
-            saveSongStack.remove(item)
-        }
-        saveSongStack.pushElement(item)
-    }
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed
