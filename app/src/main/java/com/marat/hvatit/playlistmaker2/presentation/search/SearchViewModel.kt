@@ -1,7 +1,7 @@
 package com.marat.hvatit.playlistmaker2.presentation.search
 
-import android.util.Log
-import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
@@ -14,45 +14,35 @@ import com.marat.hvatit.playlistmaker2.domain.models.Track
 class SearchViewModel(
     private val interactor: TrackInteractor, private var saveSongStack: SaveStack<Track>
 ) : ViewModel() {
+
+    private var searchState: SearchState = SearchState.StartState
+
+    private var loadingLiveData = MutableLiveData(searchState)
     init {
         saveSongStack.addAll(getSaveTracks())
-        Log.e("SaveTracks","Init:${saveSongStack.getItemsFromCache()?.toList() ?: listOf()}")
+
     }
 
-    private var searchStateObservers: ((SearchState) -> Unit)? = null
+    fun getLoadingLiveData(): LiveData<SearchState> = loadingLiveData
 
-    var searchState: SearchState = SearchState.StartState
-        private set(value){
-            field = value
-            searchStateObservers?.invoke(value)
-        }
-
-    fun changeState(newState:SearchState){
-        searchState = newState
+    fun changeState(newState: SearchState) {
+        loadingLiveData.postValue(newState)
     }
 
-    fun addSearchObserver(searchObserver: ((SearchState) -> Unit)) {
-        this.searchStateObservers = searchObserver
-    }
-
-    fun removeSearchStateObservers() {
-        this.searchStateObservers = null
-    }
 
     fun search(query: String) {
         searchState = SearchState.Download
         interactor.searchTrack(query, object : TrackInteractor.TrackConsumer {
             override fun consume(foundTrack: List<Track>) {
-                if (foundTrack.isEmpty()){
-                    @StringRes
-                    searchState = SearchState.NothingToShow(R.string.act_search_nothing)
-                }
-                else{
-                    searchState = SearchState.Data(foundTrack)
+                if (foundTrack.isEmpty()) {
+                    loadingLiveData.postValue(SearchState.NothingToShow(R.string.act_search_nothing))
+                } else {
+                    loadingLiveData.postValue(SearchState.Data(foundTrack))
                 }
             }
         })
     }
+
     fun addSaveSongs(item: Track) {
         if (saveSongStack.searchId(item)) {
             this.saveSongStack.remove(item)
@@ -60,28 +50,28 @@ class SearchViewModel(
         this.saveSongStack.pushElement(item)
     }
 
-    fun setSaveTracks(){
-        Log.e("SaveTracks","${this.saveSongStack.getItemsFromCache()}")
+    fun setSaveTracks() {
         this.saveSongStack.onDestroyStack()
     }
 
-    fun isEmptyStack():Boolean{
+    fun isEmptyStack(): Boolean {
         return this.saveSongStack.isEmpty()
     }
 
-    fun clearSaveStack(){
+    fun clearSaveStack() {
         saveSongStack.clear()
         setSaveTracks()
     }
 
     fun getSaveTracks(): List<Track> {
-        //saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
-        Log.e("saveSongStack", "getSaveTracks:${saveSongStack.getItemsFromCache()?.toList()?: listOf()}")
         return saveSongStack.getItemsFromCache()?.toList() ?: listOf()
     }
 
     companion object {
-        fun getViewModelFactory(interactor: TrackInteractor,saveSongStack: SaveStack<Track>): ViewModelProvider.Factory =
+        fun getViewModelFactory(
+            interactor: TrackInteractor,
+            saveSongStack: SaveStack<Track>
+        ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     SearchViewModel(

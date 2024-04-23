@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -95,13 +94,14 @@ class SearchActivity : AppCompatActivity() {
         recyclerSongList.layoutManager = LinearLayoutManager(this)
         recyclerSongList.adapter = trackListAdapter
 
-        saveSongStack = creator.provideSaveStack( 10)
+        saveSongStack = creator.provideSaveStack(10)
         viewModel = ViewModelProvider(
             this,
             SearchViewModel.getViewModelFactory(interactor, saveSongStack)
         )[SearchViewModel::class.java]
         //get(SearchViewModel::class.java)
-        viewModel.addSearchObserver { searchState ->
+
+        viewModel.getLoadingLiveData().observe(this) { searchState ->
             runOnUiThread {
                 onState(searchState)
             }
@@ -116,12 +116,8 @@ class SearchActivity : AppCompatActivity() {
             if (hasFocus && !viewModel.isEmptyStack()) {
                 trackListAdapter.update(viewModel.getSaveTracks())
                 viewModel.changeState(SearchState.StartState)
-                //попал только в он фокус и список всё
             } else {
                 viewModel.changeState(SearchState.ClearState)
-                /*trackListAdapter.update(viewModel.getSaveTracks())
-                viewModel.changeState(SearchState.StartState)*/
-
             }
         }
 
@@ -176,7 +172,6 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 handler.removeCallbacks(searchRunnable)
                 viewModel.search(editText.text.toString())
-                //search(editText.text.toString())
             }
             false
         }
@@ -293,16 +288,12 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        //viewModel.removeSearchStateObservers()
         handler.removeCallbacks(searchRunnable)
-        Log.e("SaveTracks", "${viewModel.getSaveTracks()}")
         viewModel.setSaveTracks()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        //viewModel.removeSearchStateObservers()
-        Log.e("SaveTracks", "${viewModel.getSaveTracks()}")
         viewModel.setSaveTracks()
     }
 
@@ -332,7 +323,6 @@ class SearchActivity : AppCompatActivity() {
         clearHistory.isVisible = true
         historyText.isVisible = true
         trackListAdapter.update(viewModel.getSaveTracks())
-        Log.e("saveSongStack", "setSavedTracks:${viewModel.getSaveTracks()}")
         trackListAdapter.notifyDataSetChanged()
     }
 
