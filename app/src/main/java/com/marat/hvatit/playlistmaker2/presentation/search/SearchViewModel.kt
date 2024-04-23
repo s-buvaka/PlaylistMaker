@@ -18,6 +18,7 @@ class SearchViewModel(
     private var searchState: SearchState = SearchState.StartState
 
     private var loadingLiveData = MutableLiveData(searchState)
+
     init {
         saveSongStack.addAll(getSaveTracks())
 
@@ -33,11 +34,15 @@ class SearchViewModel(
     fun search(query: String) {
         searchState = SearchState.Download
         interactor.searchTrack(query, object : TrackInteractor.TrackConsumer {
-            override fun consume(foundTrack: List<Track>) {
-                if (foundTrack.isEmpty()) {
-                    loadingLiveData.postValue(SearchState.NothingToShow(R.string.act_search_nothing))
+            override fun consume(foundTrack: List<Track>?, errorMessage: String?) {
+                if (foundTrack != null) {
+                    if (foundTrack.isEmpty()) {
+                        loadingLiveData.postValue(SearchState.NothingToShow(R.string.act_search_nothing))
+                    } else {
+                        loadingLiveData.postValue(SearchState.Data(foundTrack))
+                    }
                 } else {
-                    loadingLiveData.postValue(SearchState.Data(foundTrack))
+                    loadingLiveData.postValue(SearchState.Disconnected(R.string.act_search_disconnect))
                 }
             }
         })

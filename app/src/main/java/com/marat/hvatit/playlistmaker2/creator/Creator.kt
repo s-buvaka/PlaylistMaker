@@ -18,7 +18,7 @@ import com.marat.hvatit.playlistmaker2.presentation.utils.GlideHelper
 object Creator {
 
     private fun getTrackRepository(): TrackRepository {
-        return TrackRepositoryImpl(RetrofitNetworkClient())
+        return TrackRepositoryImpl(RetrofitNetworkClient(PlaylistMakerApp.applicationContext()))
     }
 
     fun provideTrackInteractor(): TrackInteractor {
