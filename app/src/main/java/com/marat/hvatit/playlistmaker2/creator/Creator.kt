@@ -3,13 +3,19 @@ package com.marat.hvatit.playlistmaker2.creator
 import com.marat.hvatit.playlistmaker2.common.GlideHelperImpl
 import com.marat.hvatit.playlistmaker2.data.AudioPlayerRepositoryImpl
 import com.marat.hvatit.playlistmaker2.data.TrackRepositoryImpl
+import com.marat.hvatit.playlistmaker2.data.dataSource.HistoryPref
+import com.marat.hvatit.playlistmaker2.data.dataSource.HistoryPrefImpl
 import com.marat.hvatit.playlistmaker2.data.dto.JsonParserImpl
 import com.marat.hvatit.playlistmaker2.data.network.RetrofitNetworkClient
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.MainInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.SettingsInteractor
 import com.marat.hvatit.playlistmaker2.domain.api.TrackInteractor
 import com.marat.hvatit.playlistmaker2.domain.api.TrackRepository
 import com.marat.hvatit.playlistmaker2.domain.impl.AudioPlayerInteractorImpl
+import com.marat.hvatit.playlistmaker2.domain.impl.MainInteractorImpl
+import com.marat.hvatit.playlistmaker2.domain.impl.SettingsInteractorImpl
 import com.marat.hvatit.playlistmaker2.domain.impl.TrackInteractorImpl
 import com.marat.hvatit.playlistmaker2.domain.models.SaveStack
 import com.marat.hvatit.playlistmaker2.domain.models.Track
@@ -25,7 +31,10 @@ object Creator {
         return TrackInteractorImpl(getTrackRepository())
     }
 
-    fun provideAudioPlayer(priviewUrl: String, callback: AudioPlayerCallback): AudioPlayerInteractor {
+    fun provideAudioPlayer(
+        priviewUrl: String,
+        callback: AudioPlayerCallback
+    ): AudioPlayerInteractor {
         return AudioPlayerInteractorImpl(AudioPlayerRepositoryImpl(priviewUrl, callback))
     }
 
@@ -37,9 +46,20 @@ object Creator {
         return GlideHelperImpl()
     }
 
-    fun provideSaveStack(size:Int): SaveStack<Track> {
-        return SaveStack<Track>(PlaylistMakerApp.applicationContext(),size)
+    fun provideSaveStack(size: Int): SaveStack<Track> {
+        return SaveStack<Track>(size, provideHistoryTracks())
     }
 
+    fun provideSettingsInteractor(): SettingsInteractor {
+        return SettingsInteractorImpl(provideHistoryTracks())
+    }
+
+    fun provideMainInteractor(): MainInteractor {
+        return MainInteractorImpl(provideHistoryTracks())
+    }
+
+    private fun provideHistoryTracks(): HistoryPref {
+        return HistoryPrefImpl(PlaylistMakerApp.applicationContext())
+    }
 
 }

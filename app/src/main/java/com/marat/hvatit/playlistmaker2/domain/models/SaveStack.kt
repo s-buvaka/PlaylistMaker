@@ -1,12 +1,9 @@
 package com.marat.hvatit.playlistmaker2.domain.models
 
-import android.content.Context
-import com.marat.hvatit.playlistmaker2.data.dto.HistoryPrefImpl
+import com.marat.hvatit.playlistmaker2.data.dataSource.HistoryPref
 import java.util.Stack
 
-class SaveStack<T>(context: Context, private val maxSize: Int) : Stack<Track>() {
-
-    private val historyPref = HistoryPrefImpl(context)
+class SaveStack<T>( private val maxSize: Int,private val historyPref : HistoryPref) : Stack<Track>() {
     fun pushElement(item: Track){
         if(size>=maxSize){
             this.removeAt(this.size - 1)
@@ -32,17 +29,11 @@ class SaveStack<T>(context: Context, private val maxSize: Int) : Stack<Track>() 
     }
 
     fun getItemsFromCache(): List<Track>? {
-        //Log.e("saveSongStack", "getSaveTracks:${historyPref.getItemsFromCache()}")
         return historyPref.getItemsFromCache()
     }
 
     private fun saveItemsToCache(newItems: List<Track>) {
         historyPref.saveItemsToCache(newItems)
-    }
-
-    fun interface SaveStackItemsListener {
-        //Не успеваю реализовать, форсмажор
-        fun onItemsChanged(items: List<Track>)
     }
 
 }
