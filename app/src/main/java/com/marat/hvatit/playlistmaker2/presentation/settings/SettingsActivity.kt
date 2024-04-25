@@ -2,7 +2,6 @@ package com.marat.hvatit.playlistmaker2.presentation.settings
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -19,6 +18,7 @@ private const val TAG = "SettingsActivity"
 class SettingsActivity : AppCompatActivity() {
     private lateinit var viewModel: SettingsViewModel
     private val interactor = Creator.provideSettingsInteractor()
+    private val intentNavigator = Creator.provideIntentNavigator(this)
 
     companion object {
         fun getIntent(context: Context, message: String): Intent {
@@ -38,13 +38,13 @@ class SettingsActivity : AppCompatActivity() {
         val buttonSupport = findViewById<LinearLayout>(R.id.llthree)
         val buttonUserAgreement = findViewById<LinearLayout>(R.id.llfour)
 
-        buttonShare.setOnClickListener { createIntent(ActionFilter.SHARE) }
-        buttonSupport.setOnClickListener { createIntent(ActionFilter.SUPPORT) }
-        buttonUserAgreement.setOnClickListener { createIntent(ActionFilter.USERAGREEMENT) }
+        buttonShare.setOnClickListener { viewModel.createIntent(ActionFilter.SHARE) }
+        buttonSupport.setOnClickListener { viewModel.createIntent(ActionFilter.SUPPORT) }
+        buttonUserAgreement.setOnClickListener { viewModel.createIntent(ActionFilter.USERAGREEMENT) }
         //.....................................................
         viewModel = ViewModelProvider(
             this,
-            SettingsViewModel.getViewModelFactory(interactor)
+            SettingsViewModel.getViewModelFactory(interactor,intentNavigator)
         )[SettingsViewModel::class.java]
 
 
@@ -63,40 +63,6 @@ class SettingsActivity : AppCompatActivity() {
 
         }
 
-    }
-
-
-    private fun createIntent(action: ActionFilter) {
-        val intentAction: Intent
-        when (action) {
-            ActionFilter.SHARE -> {
-                val textshare = this.getString(R.string.text_share)
-                intentAction = Intent(Intent.ACTION_SEND).apply {
-                    putExtra(Intent.EXTRA_TEXT, textshare)
-                    type = "text/plain"
-                }
-                startActivity(intentAction)
-            }
-
-            ActionFilter.SUPPORT -> {
-                val tittleSend = this.getString(R.string.tittle_Send)
-                val textSend = this.getString(R.string.text_Send)
-                intentAction = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:")
-                    putExtra(Intent.EXTRA_EMAIL, R.string.my_email)
-                    putExtra(Intent.EXTRA_SUBJECT, tittleSend)
-                    putExtra(Intent.EXTRA_TEXT, textSend)
-
-                }
-                startActivity(intentAction)
-            }
-
-            ActionFilter.USERAGREEMENT -> {
-                val textuseragreement = this.getString(R.string.text_useragreement)
-                intentAction = Intent(Intent.ACTION_VIEW, Uri.parse(textuseragreement))
-                startActivity(intentAction)
-            }
-        }
     }
 
 }

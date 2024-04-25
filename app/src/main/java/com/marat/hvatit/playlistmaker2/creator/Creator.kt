@@ -1,14 +1,17 @@
 package com.marat.hvatit.playlistmaker2.creator
 
+import android.content.Context
 import com.marat.hvatit.playlistmaker2.common.GlideHelperImpl
 import com.marat.hvatit.playlistmaker2.data.AudioPlayerRepositoryImpl
 import com.marat.hvatit.playlistmaker2.data.TrackRepositoryImpl
 import com.marat.hvatit.playlistmaker2.data.dataSource.HistoryPref
 import com.marat.hvatit.playlistmaker2.data.dataSource.HistoryPrefImpl
 import com.marat.hvatit.playlistmaker2.data.dto.JsonParserImpl
+import com.marat.hvatit.playlistmaker2.data.network.IntentNavigatorImpl
 import com.marat.hvatit.playlistmaker2.data.network.RetrofitNetworkClient
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.IntentNavigator
 import com.marat.hvatit.playlistmaker2.domain.api.MainInteractor
 import com.marat.hvatit.playlistmaker2.domain.api.SettingsInteractor
 import com.marat.hvatit.playlistmaker2.domain.api.TrackInteractor
@@ -56,6 +59,10 @@ object Creator {
 
     fun provideMainInteractor(): MainInteractor {
         return MainInteractorImpl(provideHistoryTracks())
+    }
+
+    fun provideIntentNavigator(context: Context): IntentNavigator {
+        return IntentNavigatorImpl(context)
     }
 
     private fun provideHistoryTracks(): HistoryPref {
