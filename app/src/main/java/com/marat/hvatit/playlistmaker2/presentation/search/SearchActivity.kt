@@ -188,6 +188,8 @@ class SearchActivity : AppCompatActivity() {
         trackListAdapter.saveTrackListener = TrackListAdapter.SaveTrackListener {
             if (clickDebounce()) {
                 viewModel.addSaveSongs(it)
+                trackListAdapter.update(viewModel.getSaveTracks())
+                trackListAdapter.notifyDataSetChanged()
                 AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
                     .apply {
                         putExtra("Track", gson.objectToJson(it)/*toJson(it)*/)
