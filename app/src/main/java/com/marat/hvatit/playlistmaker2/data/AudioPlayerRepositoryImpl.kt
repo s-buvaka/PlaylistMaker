@@ -15,23 +15,22 @@ class AudioPlayerRepositoryImpl(
 
 
     private var mediaPlayer = MediaPlayer()
-    private var playerState = MediaPlayerState.STATE_DEFAULT
+    private var playerState: MediaPlayerState = MediaPlayerState.Default
     override fun stateControl(): MediaPlayerState {
         when (playerState) {
-            MediaPlayerState.STATE_PLAYING -> {
-                pausePlayer()
-            }
-
-            MediaPlayerState.STATE_PAUSED -> {
-                startPlayer()
-            }
-
-            MediaPlayerState.STATE_DEFAULT -> {
+            MediaPlayerState.Default -> {
                 preparePlayer(priviewUrl)
             }
 
-            MediaPlayerState.STATE_PREPARED -> {
+            MediaPlayerState.Prepared -> {
                 startPlayer()
+            }
+
+            is MediaPlayerState.Paused -> {
+                startPlayer()
+            }
+            is MediaPlayerState.Playing -> {
+                pausePlayer()
             }
         }
         return playerState
@@ -41,23 +40,23 @@ class AudioPlayerRepositoryImpl(
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            playerState = MediaPlayerState.STATE_PREPARED
+            playerState = MediaPlayerState.Prepared
         }
     }
 
     private fun startPlayer() {
         mediaPlayer.start()
-        playerState = MediaPlayerState.STATE_PLAYING
+        playerState = MediaPlayerState.Playing(getCurrentTime())
         mediaPlayer.setOnCompletionListener {
             mediaPlayer.seekTo(0)
-            playerState = MediaPlayerState.STATE_PREPARED
+            playerState = MediaPlayerState.Prepared
             activityCallBack.trackIsDone()
         }
     }
 
     private fun pausePlayer() {
         mediaPlayer.pause()
-        playerState = MediaPlayerState.STATE_PAUSED
+        playerState = MediaPlayerState.Paused
     }
 
     override fun getCurrentTime(): String {

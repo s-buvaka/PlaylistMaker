@@ -23,10 +23,6 @@ import java.util.Locale
 
 private const val TAG = "AudioplayerActivity"
 
-enum class MediaPlayerState {
-    STATE_DEFAULT, STATE_PREPARED, STATE_PLAYING, STATE_PAUSED
-}
-
 class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
 
     private lateinit var intent: Intent
@@ -107,9 +103,15 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
         setTextContent(result)
         buttonPlay.isEnabled = false
 
-        playbackControl()
+        viewModel.playbackControl()
         buttonPlay.setOnClickListener {
-            playbackControl()
+            viewModel.playbackControl()
+        }
+
+        viewModel.getLoadingLiveData().observe(this) { playerState ->
+            runOnUiThread {
+                playbackControl(playerState)
+            }
         }
 
     }
@@ -140,35 +142,42 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
         viewModel.destroyPlayer()
     }
 
-    private fun playbackControl() {
+    private fun playbackControl(state: MediaPlayerState) {
         //playerState = interactor.playbackControl()
         //viewModel.playbackControl()
-        when (viewModel.playbackControl()) {
-            MediaPlayerState.STATE_PLAYING -> {
-                buttonPlay.setBackgroundResource(R.drawable.button_stop)
-                updateTimer()
-            }
+        when (state) {
 
-            MediaPlayerState.STATE_PAUSED -> {
-                buttonPlay.setBackgroundResource(R.drawable.button_play)
-                stopTimer()
-            }
-
-            MediaPlayerState.STATE_DEFAULT -> {
+            MediaPlayerState.Default -> {
                 buttonPlay.setBackgroundResource(R.drawable.button_play)
                 buttonPlay.isEnabled = true
             }
 
-            MediaPlayerState.STATE_PREPARED -> {
+            is MediaPlayerState.Paused -> {
+                stopTimer()
                 buttonPlay.setBackgroundResource(R.drawable.button_play)
+                Log.e("MediaState", "is MediaPlayerState.Paused")
+                //updateTimer()
+            }
 
+            is MediaPlayerState.Playing -> {
+                buttonPlay.setBackgroundResource(R.drawable.button_stop)
+                priviewTimer.text = state.currentTime
+                updateTimer()
+                //priviewTimer.text = state.currentTime
+            }
+
+            MediaPlayerState.Prepared -> {
+                buttonPlay.setBackgroundResource(R.drawable.button_play)
             }
         }
     }
 
     private fun updateTimer() {
+        stopTimer()
         //priviewTimer.text = interactor.updateTimer()
-        priviewTimer.text = viewModel.updateTimer()
+        //priviewTimer.text = viewModel.updateTimer()
+        Log.e("MediaState", "updateTimer")
+        viewModel.refreshTime()
         handler.postDelayed(timerRunnable, 1000L)
     }
 
