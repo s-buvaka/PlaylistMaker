@@ -3,8 +3,6 @@ package com.marat.hvatit.playlistmaker2.presentation.audioplayer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
@@ -23,7 +21,8 @@ import java.util.Locale
 
 private const val TAG = "AudioplayerActivity"
 
-class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
+class AudioplayerActivity : AppCompatActivity(),
+    AudioPlayerCallback {
 
     private lateinit var intent: Intent
     private val simpleDateFormat: SimpleDateFormat =
@@ -47,8 +46,6 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
 
     private lateinit var priviewUrl: String
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val timerRunnable: Runnable = Runnable { updateTimer() }
 
     private val creator: Creator = Creator
     private lateinit var interactor: AudioPlayerInteractor
@@ -130,15 +127,12 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
 
     override fun onPause() {
         super.onPause()
-        //interactor.stopPlayer()
         viewModel.stopPlayer()
         buttonPlay.setBackgroundResource(R.drawable.button_play)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeCallbacks(timerRunnable)
-        //interactor.destroyPlayer()
         viewModel.destroyPlayer()
     }
 
@@ -153,17 +147,13 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
             }
 
             is MediaPlayerState.Paused -> {
-                stopTimer()
                 buttonPlay.setBackgroundResource(R.drawable.button_play)
                 Log.e("MediaState", "is MediaPlayerState.Paused")
-                //updateTimer()
             }
 
             is MediaPlayerState.Playing -> {
                 buttonPlay.setBackgroundResource(R.drawable.button_stop)
                 priviewTimer.text = state.currentTime
-                updateTimer()
-                //priviewTimer.text = state.currentTime
             }
 
             MediaPlayerState.Prepared -> {
@@ -172,22 +162,8 @@ class AudioplayerActivity : AppCompatActivity(), AudioPlayerCallback {
         }
     }
 
-    private fun updateTimer() {
-        stopTimer()
-        //priviewTimer.text = interactor.updateTimer()
-        //priviewTimer.text = viewModel.updateTimer()
-        Log.e("MediaState", "updateTimer")
-        viewModel.refreshTime()
-        handler.postDelayed(timerRunnable, 1000L)
-    }
-
-    private fun stopTimer() {
-        handler.removeCallbacks(timerRunnable)
-    }
-
     override fun trackIsDone() {
-        stopTimer()
+        viewModel.trackIsDone()
         priviewTimer.text = "00:00"
     }
-
 }
