@@ -113,9 +113,8 @@ class SearchActivity : AppCompatActivity() {
         //..............................................................
 
         editText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && !viewModel.isEmptyStack()) {
-                trackListAdapter.update(viewModel.getSaveTracks())
-                viewModel.changeState(SearchState.StartState)
+            if (hasFocus) {
+                viewModel.setSavedTracks()
             } else {
                 viewModel.changeState(SearchState.ClearState)
             }
@@ -135,11 +134,7 @@ class SearchActivity : AppCompatActivity() {
                 saveEditText = s.toString()
                 if (s.isNullOrEmpty()) {
                     handler.removeCallbacks(searchRunnable)
-                    if (viewModel.isEmptyStack()) {
-                        viewModel.changeState(SearchState.ClearState)
-                    } else {
-                        viewModel.changeState(SearchState.StartState)
-                    }
+                    viewModel.setSavedTracks()
                 } else {
                     searchText = s.toString()
                     searchDebounce()
@@ -160,11 +155,7 @@ class SearchActivity : AppCompatActivity() {
             (this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
                 editText.windowToken, 0
             )
-            if (viewModel.isEmptyStack()) {
-                viewModel.changeState(SearchState.ClearState)
-            } else {
-                viewModel.changeState(SearchState.StartState)
-            }
+            viewModel.setSavedTracks()
             trackListAdapter.notifyDataSetChanged()
         }
 
@@ -188,7 +179,6 @@ class SearchActivity : AppCompatActivity() {
         trackListAdapter.saveTrackListener = TrackListAdapter.SaveTrackListener {
             if (clickDebounce()) {
                 viewModel.addSaveSongs(it)
-                trackListAdapter.update(viewModel.getSaveTracks())
                 trackListAdapter.notifyDataSetChanged()
                 AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
                     .apply {
@@ -275,11 +265,11 @@ class SearchActivity : AppCompatActivity() {
             }
 
             is SearchState.StartState -> {
+                trackListAdapter.update(searchState.cacheTracks)
                 placeholder.isVisible = false
                 buttonupdate.isVisible = false
                 texterror.isVisible = false
                 progressBar.isVisible = false
-                getSavedTracksAct()
 
                 clearHistory.isVisible = true
                 historyText.isVisible = true
@@ -291,12 +281,11 @@ class SearchActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         handler.removeCallbacks(searchRunnable)
-        viewModel.setSaveTracks()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.setSaveTracks()
+        viewModel.saveTracksToCache()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -316,18 +305,6 @@ class SearchActivity : AppCompatActivity() {
             ImageButton.VISIBLE
         }
     }
-
-    private fun getSavedTracksAct() {
-        if (viewModel.isEmptyStack()) {
-            clearHistory.isVisible = false
-            historyText.isVisible = false
-        }
-        clearHistory.isVisible = true
-        historyText.isVisible = true
-        trackListAdapter.update(viewModel.getSaveTracks())
-        trackListAdapter.notifyDataSetChanged()
-    }
-
 
     private fun clickDebounce(): Boolean {
         val current = isClickAllowed

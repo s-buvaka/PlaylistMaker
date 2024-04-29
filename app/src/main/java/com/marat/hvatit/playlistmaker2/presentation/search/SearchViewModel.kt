@@ -15,12 +15,13 @@ class SearchViewModel(
     private val interactor: TrackInteractor, private var saveSongStack: SaveStack<Track>
 ) : ViewModel() {
 
-    private var searchState: SearchState = SearchState.StartState
+    private var searchState: SearchState =
+        SearchState.StartState(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
 
     private var loadingLiveData = MutableLiveData(searchState)
 
     init {
-        saveSongStack.addAll(getSaveTracks())
+        saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
 
     }
 
@@ -55,21 +56,26 @@ class SearchViewModel(
         this.saveSongStack.pushElement(item)
     }
 
-    fun setSaveTracks() {
+    fun saveTracksToCache() {
         this.saveSongStack.onDestroyStack()
-    }
-
-    fun isEmptyStack(): Boolean {
-        return this.saveSongStack.isEmpty()
     }
 
     fun clearSaveStack() {
         saveSongStack.clear()
-        setSaveTracks()
+        saveTracksToCache()
     }
 
-    fun getSaveTracks(): List<Track> {
-        return saveSongStack.getItemsFromCache()?.toList() ?: listOf()
+    fun setSavedTracks() {
+        if (saveSongStack.getItemsFromCache()?.isEmpty() == true) {
+            loadingLiveData.postValue(SearchState.ClearState)
+        } else {
+            loadingLiveData.postValue(
+                SearchState.StartState(
+                    saveSongStack.getItemsFromCache()?.toList() ?: listOf()
+                )
+            )
+        }
+        //return saveSongStack.getItemsFromCache()?.toList() ?: listOf()
     }
 
     companion object {

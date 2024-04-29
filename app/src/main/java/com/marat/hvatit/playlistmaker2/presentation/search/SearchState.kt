@@ -9,7 +9,7 @@ sealed interface SearchState {
     class Disconnected(val message: Int) : SearchState
     class NothingToShow(val message: Int) : SearchState
 
-    object StartState : SearchState
+    data class StartState(val cacheTracks: List<Track>) : SearchState
 
     object ClearState : SearchState
 
