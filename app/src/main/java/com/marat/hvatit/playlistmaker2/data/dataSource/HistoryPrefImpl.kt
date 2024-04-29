@@ -1,19 +1,18 @@
 package com.marat.hvatit.playlistmaker2.data.dataSource
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 
-private const val KEY_CART = "cart"
+
 private const val KEY_THEME = "night_mode_enabled"
 private const val KEY_TRACKS = "items"
 
-class HistoryPrefImpl(val context: Context) : HistoryPref {
+class HistoryPrefImpl(val context: Context,private val sharedPreferences: SharedPreferences , private val gson: Gson) : HistoryPref {
 
-    private val sharedPreferences = context.getSharedPreferences(KEY_CART, Context.MODE_PRIVATE)
-    private val gson: Gson = Gson()
     override fun getItemsFromCache(): List<Track> {
         val json: String? = sharedPreferences.getString(KEY_TRACKS, null)
         return if (json != null) {

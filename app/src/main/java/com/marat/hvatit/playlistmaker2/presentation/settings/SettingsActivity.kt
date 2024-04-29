@@ -19,6 +19,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var viewModel: SettingsViewModel
     private val interactor = Creator.provideSettingsInteractor()
     private val intentNavigator = Creator.provideIntentNavigator(this)
+    private lateinit var buttonSwitchTheme : SwitchCompat
 
     companion object {
         fun getIntent(context: Context, message: String): Intent {
@@ -33,7 +34,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
 
         val buttonBack = findViewById<View>(R.id.back)
-        val buttonSwitchTheme = findViewById<SwitchCompat>(R.id.bswitch)
+        buttonSwitchTheme = findViewById<SwitchCompat>(R.id.bswitch)
         val buttonShare = findViewById<LinearLayout>(R.id.lltwo)
         val buttonSupport = findViewById<LinearLayout>(R.id.llthree)
         val buttonUserAgreement = findViewById<LinearLayout>(R.id.llfour)
@@ -43,8 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         buttonUserAgreement.setOnClickListener { viewModel.createIntent(ActionFilter.USERAGREEMENT) }
         //.....................................................
         viewModel = ViewModelProvider(
-            this,
-            SettingsViewModel.getViewModelFactory(interactor,intentNavigator)
+            this, SettingsViewModel.getViewModelFactory(interactor, intentNavigator)
         )[SettingsViewModel::class.java]
 
 
@@ -52,17 +52,21 @@ class SettingsActivity : AppCompatActivity() {
             onBackPressed()
         }
 
-        buttonSwitchTheme.isChecked = viewModel.isDarkMode()
-
         buttonSwitchTheme.setOnCheckedChangeListener { _, isChecked ->
-            val mode =
-                if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            AppCompatDelegate.setDefaultNightMode(mode)
-            viewModel.storeMode(isChecked)
-
-
+            switchTheme(isChecked)
+        }
+        viewModel.getLoadingLiveData().observe(this) {
+            switchTheme(it)
         }
 
+    }
+
+    private fun switchTheme(isChecked: Boolean) {
+        buttonSwitchTheme.isChecked = isChecked
+        val mode =
+            if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        AppCompatDelegate.setDefaultNightMode(mode)
+        viewModel.storeMode(isChecked)
     }
 
 }

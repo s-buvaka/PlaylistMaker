@@ -22,7 +22,6 @@ class SearchViewModel(
 
     init {
         saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
-
     }
 
     fun getLoadingLiveData(): LiveData<SearchState> = loadingLiveData

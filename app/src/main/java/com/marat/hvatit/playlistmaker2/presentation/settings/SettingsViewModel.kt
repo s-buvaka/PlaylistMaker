@@ -1,5 +1,7 @@
 package com.marat.hvatit.playlistmaker2.presentation.settings
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
@@ -13,12 +15,25 @@ class SettingsViewModel(
     private val intentNavigator: IntentNavigator
 ) : ViewModel() {
 
+    private var settingsThemeState: Boolean = interactor.getPrefTheme()
 
-    fun isDarkMode(): Boolean {
-        return interactor.getPrefTheme()
+    private var loadingLiveData = MutableLiveData(settingsThemeState)
+
+    var isChecked: Boolean = true
+        private set(value) {
+            field = value
+        }
+
+    fun getLoadingLiveData(): LiveData<Boolean> = loadingLiveData
+
+
+    fun isDarkMode() {
+        loadingLiveData.postValue(interactor.getPrefTheme())
+        //return interactor.getPrefTheme()
     }
 
     fun storeMode(isDark: Boolean) {
+        loadingLiveData.postValue(isDark)
         interactor.editPrefTheme(isDark)
     }
 

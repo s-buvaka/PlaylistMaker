@@ -1,6 +1,8 @@
 package com.marat.hvatit.playlistmaker2.creator
 
 import android.content.Context
+import android.content.SharedPreferences
+import com.google.gson.Gson
 import com.marat.hvatit.playlistmaker2.common.GlideHelperImpl
 import com.marat.hvatit.playlistmaker2.data.AudioPlayerRepositoryImpl
 import com.marat.hvatit.playlistmaker2.data.TrackRepositoryImpl
@@ -26,6 +28,8 @@ import com.marat.hvatit.playlistmaker2.presentation.utils.GlideHelper
 
 object Creator {
 
+    private const val KEY_CART = "cart"
+
     private fun getTrackRepository(): TrackRepository {
         return TrackRepositoryImpl(RetrofitNetworkClient(PlaylistMakerApp.applicationContext()))
     }
@@ -42,7 +46,7 @@ object Creator {
     }
 
     fun provideJsonParser(): JsonParserImpl {
-        return JsonParserImpl()
+        return JsonParserImpl(provideGson())
     }
 
     fun provideGlideHelper(): GlideHelper {
@@ -66,7 +70,19 @@ object Creator {
     }
 
     private fun provideHistoryTracks(): HistoryPref {
-        return HistoryPrefImpl(PlaylistMakerApp.applicationContext())
+        return HistoryPrefImpl(
+            PlaylistMakerApp.applicationContext(), provideSharedPref(),
+            provideGson()
+        )
+    }
+
+    private fun provideSharedPref(): SharedPreferences {
+        return PlaylistMakerApp.applicationContext()
+            .getSharedPreferences(KEY_CART, Context.MODE_PRIVATE)
+    }
+
+    private fun provideGson(): Gson {
+        return Gson()
     }
 
 }
