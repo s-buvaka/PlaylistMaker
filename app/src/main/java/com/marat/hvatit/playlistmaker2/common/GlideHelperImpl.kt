@@ -5,19 +5,18 @@ import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.marat.hvatit.playlistmaker2.R
-import com.marat.hvatit.playlistmaker2.domain.models.Track
 import com.marat.hvatit.playlistmaker2.presentation.utils.GlideHelper
 
 class GlideHelperImpl : GlideHelper {
 
     override fun setImage(
-        applicationContext: Context,
-        song: Track,
+        context: Context,
+        url: String,
+        actplayerCover: ImageView,
         roundedCornersImage: Int,
-        actplayerCover: ImageView
     ) {
-        Glide.with(applicationContext)
-            .load(song.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"))
+        Glide.with(context)
+            .load(url)
             .placeholder(R.drawable.placeholder)
             .transform(RoundedCorners(roundedCornersImage))
             .into(actplayerCover)

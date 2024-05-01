@@ -7,11 +7,17 @@ import android.os.Build
 import com.marat.hvatit.playlistmaker2.data.NetworkClient
 import com.marat.hvatit.playlistmaker2.data.dto.Response
 import com.marat.hvatit.playlistmaker2.data.dto.TrackSearchRequest
+import com.marat.hvatit.playlistmaker2.data.dto.TrackSearchResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitNetworkClient(private val context: Context) : NetworkClient {
+class RetrofitNetworkClient(
+    private val context: Context,
+//    private val appleBaseUrl: String  - можно провайдить извне
+) : NetworkClient {
 
+    // в константу
+    // или еще лучше провайдить ее снаружи. В данной случа опционально
     private val appleBaseUrl = "https://itunes.apple.com"
 
     private val retrofit =
@@ -21,9 +27,16 @@ class RetrofitNetworkClient(private val context: Context) : NetworkClient {
             .build()
 
     private val appleService = retrofit.create(AppleMusicApiService::class.java)
+
+    // можно сделать так, но если вас учили как что-то оборачивать, забей - и оставь как было
+    override fun search(trackSearchRequest: TrackSearchRequest): retrofit2.Response<TrackSearchResponse> {
+        return appleService.search(trackSearchRequest.expression).execute()
+    }
+
+    // поскольку у тебя тут есть вызов конкретного метода appleService.search - то и назвать его нужно  search
     override fun doRequest(dto: Any): Response {
         if (dto is TrackSearchRequest) {
-            if (isConnected() == false) {
+            if (!isConnected()) {
                 return Response().apply { resultCode = -1 }
             }
             val resp = appleService.search(dto.expression).execute()

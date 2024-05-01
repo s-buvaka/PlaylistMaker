@@ -1,7 +1,7 @@
-package com.marat.hvatit.playlistmaker2.domain.impl
+package com.marat.hvatit.playlistmaker2.domain.api.interactors.impl
 
-import com.marat.hvatit.playlistmaker2.domain.api.TrackInteractor
-import com.marat.hvatit.playlistmaker2.domain.api.TrackRepository
+import com.marat.hvatit.playlistmaker2.domain.api.interactors.TrackInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.repository.TrackRepository
 import com.marat.hvatit.playlistmaker2.presentation.utils.Resource
 import java.util.concurrent.Executors
 

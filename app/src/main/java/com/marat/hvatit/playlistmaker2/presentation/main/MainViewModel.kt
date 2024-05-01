@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.marat.hvatit.playlistmaker2.domain.api.MainInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.interactors.MainInteractor
 
 class MainViewModel(private val interactor: MainInteractor) : ViewModel() {
 

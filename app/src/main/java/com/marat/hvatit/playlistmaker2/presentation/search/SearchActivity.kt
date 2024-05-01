@@ -26,8 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.creator.Creator
-import com.marat.hvatit.playlistmaker2.domain.models.SaveStack
-import com.marat.hvatit.playlistmaker2.domain.models.Track
+import com.marat.hvatit.playlistmaker2.domain.models.TrackRepository
 import com.marat.hvatit.playlistmaker2.presentation.audioplayer.AudioplayerActivity
 
 
@@ -42,7 +41,7 @@ class SearchActivity : AppCompatActivity() {
     private val creator: Creator = Creator
     private val interactor = creator.provideTrackInteractor()
     private val gson = creator.provideJsonParser()
-    private lateinit var saveSongStack: SaveStack<Track>
+    private lateinit var saveSongStack: TrackRepository
 
 
     private val trackListAdapter = TrackListAdapter()
@@ -122,35 +121,9 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        val simpletextWatcher = object : TextWatcher {
-            @RequiresApi(Build.VERSION_CODES.Q)
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                //empty
-            }
+        editText.addTextChangedListener(textWatcher(buttonClear))
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                clearButtonVisibility(s).also { buttonClear.visibility = it }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                saveEditText = s.toString()
-                if (s.isNullOrEmpty()) {
-                    handler.removeCallbacks(searchRunnable)
-                    viewModel.setSavedTracks()
-                    trackListAdapter.notifyDataSetChanged()
-                } else {
-                    searchText = s.toString()
-                    searchDebounce()
-                }
-            }
-
-        }
-
-        editText.addTextChangedListener(simpletextWatcher)
-
-        buttonBack.setOnClickListener {
-            onBackPressed()
-        }
+        buttonBack.setOnClickListener { onBackPressed() }
 
         buttonClear.setOnClickListener {
             editText.requestFocus()
@@ -182,7 +155,7 @@ class SearchActivity : AppCompatActivity() {
         trackListAdapter.saveTrackListener = TrackListAdapter.SaveTrackListener {
             if (clickDebounce()) {
                 viewModel.addSaveSongs(it)
-                Log.e("clickDebounce","$it")
+                Log.e("clickDebounce", "$it")
                 //trackListAdapter.notifyDataSetChanged()
                 AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
                     .apply {
@@ -195,55 +168,38 @@ class SearchActivity : AppCompatActivity() {
         buttonupdate.setOnClickListener {
             viewModel.search(editText.text.toString())
         }
+    }
 
+    private fun textWatcher(buttonClear: ImageButton) = object : TextWatcher {
+        @RequiresApi(Build.VERSION_CODES.Q)
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            //empty
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            clearButtonVisibility(s).also { buttonClear.visibility = it }
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            saveEditText = s.toString()
+            if (s.isNullOrEmpty()) {
+                handler.removeCallbacks(searchRunnable)
+                viewModel.setSavedTracks()
+                trackListAdapter.notifyDataSetChanged()
+            } else {
+                searchText = s.toString()
+                searchDebounce()
+            }
+        }
 
     }
 
     private fun onState(searchState: SearchState) {
         when (searchState) {
-            is SearchState.AllFine -> {
-                buttonupdate.isVisible = false
-                placeholder.isVisible = false
-                texterror.isVisible = false
-                progressBar.isVisible = false
-            }
-
-            is SearchState.ClearState -> {
-                trackListAdapter.update(emptyList())
-                buttonupdate.isVisible = false
-                placeholder.isVisible = false
-                texterror.isVisible = false
-
-                clearHistory.isVisible = false
-                historyText.isVisible = false
-                progressBar.isVisible = false
-            }
-
-            is SearchState.Data -> {
-                trackListAdapter.update(searchState.foundTrack)
-
-                placeholder.isVisible = false
-                buttonupdate.isVisible = false
-                texterror.isVisible = false
-                progressBar.isVisible = false
-
-                clearHistory.isVisible = false
-                historyText.isVisible = false
-            }
-
-            is SearchState.Disconnected -> {
-                trackListAdapter.update(emptyList())
-                placeholder.setImageResource(R.drawable.disconnect_problem)
-                placeholder.isVisible = true
-                buttonupdate.isVisible = true
-                texterror.text = applicationContext.getString(searchState.message)
-                texterror.isVisible = true
-
-
-                clearHistory.isVisible = false
-                historyText.isVisible = false
-                progressBar.isVisible = false
-            }
+            is SearchState.AllFine -> allFineState()
+            is SearchState.ClearState -> clearState()
+            is SearchState.Data -> dataState(searchState)
+            is SearchState.Disconnected -> disconnectedState(searchState)
 
             is SearchState.Download -> {
                 trackListAdapter.update(emptyList())
@@ -281,6 +237,50 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         trackListAdapter.notifyDataSetChanged()
+    }
+
+    private fun disconnectedState(searchState: SearchState.Disconnected) {
+        trackListAdapter.update(emptyList())
+        placeholder.setImageResource(R.drawable.disconnect_problem)
+        placeholder.isVisible = true
+        buttonupdate.isVisible = true
+        texterror.text = applicationContext.getString(searchState.message)
+        texterror.isVisible = true
+
+
+        clearHistory.isVisible = false
+        historyText.isVisible = false
+        progressBar.isVisible = false
+    }
+
+    private fun dataState(searchState: SearchState.Data) {
+        trackListAdapter.update(searchState.foundTrack)
+
+        placeholder.isVisible = false
+        buttonupdate.isVisible = false
+        texterror.isVisible = false
+        progressBar.isVisible = false
+
+        clearHistory.isVisible = false
+        historyText.isVisible = false
+    }
+
+    private fun clearState() {
+        trackListAdapter.update(emptyList())
+        buttonupdate.isVisible = false
+        placeholder.isVisible = false
+        texterror.isVisible = false
+
+        clearHistory.isVisible = false
+        historyText.isVisible = false
+        progressBar.isVisible = false
+    }
+
+    private fun allFineState() {
+        buttonupdate.isVisible = false
+        placeholder.isVisible = false
+        texterror.isVisible = false
+        progressBar.isVisible = false
     }
 
     override fun onStop() {

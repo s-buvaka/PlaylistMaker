@@ -15,7 +15,6 @@ class TrackViewHolder(itemView: View, private val glide: GlideHelper) : Recycler
     private val artistName: TextView
     private val trackTime: TextView
     private val trackImage: ImageView
-    private val roundedCornersImage: Int = 10
     private val simpleDateFormat: SimpleDateFormat =
         SimpleDateFormat("mm:ss", Locale.getDefault())
 
@@ -31,9 +30,12 @@ class TrackViewHolder(itemView: View, private val glide: GlideHelper) : Recycler
         trackName.text = model.trackName
         artistName.text = model.artistName
         trackTime.text = dateFormat(model.trackTimeMills)
-        glide.setImage(itemView.context,model,roundedCornersImage,trackImage)
+        glide.setImage(
+            context = itemView.context,
+            url = model.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"), // МОжно вынести в экстеншен или простую функцию
+            actplayerCover = trackImage
+        )
     }
-
 
 
     private fun dateFormat(trackTime: String): String {

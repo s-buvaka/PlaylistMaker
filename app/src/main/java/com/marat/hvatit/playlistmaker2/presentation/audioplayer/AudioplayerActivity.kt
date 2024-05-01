@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.marat.hvatit.playlistmaker2.R
 import com.marat.hvatit.playlistmaker2.creator.Creator
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
-import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
+import com.marat.hvatit.playlistmaker2.domain.api.interactors.AudioPlayerInteractor
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -30,7 +30,6 @@ class AudioplayerActivity : AppCompatActivity(),
 
 
     private lateinit var actplayerCover: ImageView
-    private val roundedCornersImage: Int = 10
 
     private lateinit var countryvalue: TextView
     private lateinit var genrevalue: TextView
@@ -63,6 +62,7 @@ class AudioplayerActivity : AppCompatActivity(),
         }
     }
 
+    // структурируй и наведи порядок
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioplayer)
@@ -79,17 +79,7 @@ class AudioplayerActivity : AppCompatActivity(),
             AudioViewModel.getViewModelFactory(interactor)
         )[AudioViewModel::class.java]
         //..............................................................
-        actplayerCover = findViewById(R.id.actplayer_cover)
-        artistName = findViewById(R.id.actplayer_artist_name)
-        trackName = findViewById(R.id.actplayer_track_name)
-        //..............................................................
-        countryvalue = findViewById(R.id.actplayer_countryvalue)
-        genrevalue = findViewById(R.id.actplayer_genrevalue)
-        yearvalue = findViewById(R.id.actplayer_yearvalue)
-        albumvalue = findViewById(R.id.actplayer_albumvalue)
-        durationvalue = findViewById(R.id.actplayer_durationvalue)
-        buttonPlay = findViewById(R.id.actplayer_buttonplay)
-        priviewTimer = findViewById(R.id.actplayer_tracktime)
+        initViews()
 
         //..............................................................
         val buttonBack = findViewById<View>(R.id.back)
@@ -113,8 +103,26 @@ class AudioplayerActivity : AppCompatActivity(),
 
     }
 
+    private fun initViews() {
+        actplayerCover = findViewById(R.id.actplayer_cover)
+        artistName = findViewById(R.id.actplayer_artist_name)
+        trackName = findViewById(R.id.actplayer_track_name)
+        //..............................................................
+        countryvalue = findViewById(R.id.actplayer_countryvalue)
+        genrevalue = findViewById(R.id.actplayer_genrevalue)
+        yearvalue = findViewById(R.id.actplayer_yearvalue)
+        albumvalue = findViewById(R.id.actplayer_albumvalue)
+        durationvalue = findViewById(R.id.actplayer_durationvalue)
+        buttonPlay = findViewById(R.id.actplayer_buttonplay)
+        priviewTimer = findViewById(R.id.actplayer_tracktime)
+    }
+
     private fun setTextContent(song: Track) {
-        glide.setImage(applicationContext, song, roundedCornersImage, actplayerCover)
+        glide.setImage(
+            context = this,
+            url = song.artworkUrl100.replaceAfterLast('/', "512x512bb.jpg"),
+            actplayerCover = actplayerCover,
+        )
         durationvalue.setText(simpleDateFormat.format(song.trackTimeMills.toLong()))
         artistName.setText(song.artistName)
         trackName.setText(song.trackName)
@@ -122,7 +130,7 @@ class AudioplayerActivity : AppCompatActivity(),
         genrevalue.setText(song.genre)
         yearvalue.setText(song.year.substring(0, song.year.indexOf("-")))
         albumvalue.setText(song.album)
-        priviewTimer.text = "00:30"
+        priviewTimer.text = "00:30" // в ресурсы
     }
 
     override fun onPause() {
@@ -140,7 +148,6 @@ class AudioplayerActivity : AppCompatActivity(),
         //playerState = interactor.playbackControl()
         //viewModel.playbackControl()
         when (state) {
-
             MediaPlayerState.Default -> {
                 buttonPlay.setBackgroundResource(R.drawable.button_play)
                 buttonPlay.isEnabled = true
@@ -164,6 +171,6 @@ class AudioplayerActivity : AppCompatActivity(),
 
     override fun trackIsDone() {
         viewModel.trackIsDone()
-        priviewTimer.text = "00:00"
+        priviewTimer.text = "00:00" // в константу или ресурсы
     }
 }

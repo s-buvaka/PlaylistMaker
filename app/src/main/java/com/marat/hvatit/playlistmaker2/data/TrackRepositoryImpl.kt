@@ -2,13 +2,19 @@ package com.marat.hvatit.playlistmaker2.data
 
 import com.marat.hvatit.playlistmaker2.data.dto.TrackSearchRequest
 import com.marat.hvatit.playlistmaker2.data.dto.TrackSearchResponse
-import com.marat.hvatit.playlistmaker2.domain.api.TrackRepository
+import com.marat.hvatit.playlistmaker2.domain.api.repository.TrackRepository
 import com.marat.hvatit.playlistmaker2.domain.models.Track
 import com.marat.hvatit.playlistmaker2.presentation.utils.Resource
 
 class TrackRepositoryImpl(private val networkClient: NetworkClient) : TrackRepository {
     override fun searchTrack(expression: String): Resource<List<Track>> {
         val response = networkClient.doRequest(TrackSearchRequest(expression))
+        val trackResponse = networkClient.search(TrackSearchRequest(expression))
+
+        when (trackResponse.code()) {
+            // TODO весь код ниже можно сюда
+        }
+
         return when (response.resultCode) {
             -1 -> {
                 Resource.Error("ERROR1111!")

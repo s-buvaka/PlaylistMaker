@@ -1,9 +1,10 @@
 package com.marat.hvatit.playlistmaker2.domain.models
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 
+// в доменных сущностнях не надо ничего про сериализацию
+// удалить все @SerializedName
 data class Track(
     val trackId: String,
     val trackName: String,

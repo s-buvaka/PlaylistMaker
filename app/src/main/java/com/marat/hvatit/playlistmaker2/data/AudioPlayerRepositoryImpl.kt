@@ -2,27 +2,28 @@ package com.marat.hvatit.playlistmaker2.data
 
 import android.media.MediaPlayer
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
-import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerRepository
+import com.marat.hvatit.playlistmaker2.domain.api.repository.AudioPlayerRepository
 import com.marat.hvatit.playlistmaker2.presentation.audioplayer.MediaPlayerState
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// это не репозиторий, это может быть что-то типа AudioPlayerHandler или AudioPlayerController и т.д.
+// и потому его нужно убрать из дата слоя и отправить куда-то в презентейшен
+// https://blog.skillfactory.ru/glossary/repozitorij/
 class AudioPlayerRepositoryImpl(
     private val priviewUrl: String,
     private val activityCallBack: AudioPlayerCallback
-) :
-    AudioPlayerRepository {
-
+) : AudioPlayerRepository {
 
     private var mediaPlayer = MediaPlayer()
     private var playerState: MediaPlayerState = MediaPlayerState.Default
     override fun stateControl(): MediaPlayerState {
         when (playerState) {
-            MediaPlayerState.Default -> {
+            is MediaPlayerState.Default -> {
                 preparePlayer(priviewUrl)
             }
 
-            MediaPlayerState.Prepared -> {
+            is MediaPlayerState.Prepared -> {
                 startPlayer()
             }
 

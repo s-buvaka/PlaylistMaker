@@ -11,9 +11,25 @@ import com.marat.hvatit.playlistmaker2.domain.models.Track
 private const val KEY_THEME = "night_mode_enabled"
 private const val KEY_TRACKS = "items"
 
-class HistoryPrefImpl(val context: Context,private val sharedPreferences: SharedPreferences , private val gson: Gson) : HistoryPref {
+class HistoryStorageImpl(val context: Context, private val sharedPreferences: SharedPreferences, private val gson: Gson) : HistoryStorage {
 
-    override fun getItemsFromCache(): List<Track> {
+    override var trackList: List<Track>
+        set(value) {
+            val json = gson.toJson(value)
+            sharedPreferences.edit()
+                .putString(KEY_TRACKS, json)
+                .apply()
+        }
+        get() {
+            val json: String? = sharedPreferences.getString(KEY_TRACKS, null)
+            return if (json != null) {
+                gson.fromJson(json, object : TypeToken<List<Track>>() {}.type)
+            } else {
+                emptyList()
+            }
+        }
+
+    override fun getTrackList(): List<Track> {
         val json: String? = sharedPreferences.getString(KEY_TRACKS, null)
         return if (json != null) {
             Log.e(
@@ -29,7 +45,7 @@ class HistoryPrefImpl(val context: Context,private val sharedPreferences: Shared
         } else emptyList()
     }
 
-    override fun saveItemsToCache(newItems: List<Track>) {
+    override fun saveTrackList(newItems: List<Track>) {
         val json = gson.toJson(newItems)
         sharedPreferences.edit()
             .putString(KEY_TRACKS, json)

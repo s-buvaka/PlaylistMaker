@@ -2,7 +2,9 @@ package com.marat.hvatit.playlistmaker2.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class TrackDto(
+// хорошим тоном делать все переменные с аннотацией  @SerializedName(...)
+// ты не зависишь от названия переменных на беке и можешь менять их нейминг раздельно.
+data class TrackDto( // обычно DTO модельки не надо делать data
     val trackId: String,
     val trackName: String,
     val artistName: String,
