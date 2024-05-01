@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -115,6 +116,7 @@ class SearchActivity : AppCompatActivity() {
         editText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 viewModel.setSavedTracks()
+                trackListAdapter.notifyDataSetChanged()
             } else {
                 viewModel.changeState(SearchState.ClearState)
             }
@@ -135,6 +137,7 @@ class SearchActivity : AppCompatActivity() {
                 if (s.isNullOrEmpty()) {
                     handler.removeCallbacks(searchRunnable)
                     viewModel.setSavedTracks()
+                    trackListAdapter.notifyDataSetChanged()
                 } else {
                     searchText = s.toString()
                     searchDebounce()
@@ -156,7 +159,7 @@ class SearchActivity : AppCompatActivity() {
                 editText.windowToken, 0
             )
             viewModel.setSavedTracks()
-            trackListAdapter.notifyDataSetChanged()
+            //trackListAdapter.notifyDataSetChanged()
         }
 
         editText.setOnEditorActionListener { _, actionId, _ ->
@@ -179,7 +182,8 @@ class SearchActivity : AppCompatActivity() {
         trackListAdapter.saveTrackListener = TrackListAdapter.SaveTrackListener {
             if (clickDebounce()) {
                 viewModel.addSaveSongs(it)
-                trackListAdapter.notifyDataSetChanged()
+                Log.e("clickDebounce","$it")
+                //trackListAdapter.notifyDataSetChanged()
                 AudioplayerActivity.getIntent(this@SearchActivity, this.getString(R.string.android))
                     .apply {
                         putExtra("Track", gson.objectToJson(it)/*toJson(it)*/)
@@ -273,6 +277,7 @@ class SearchActivity : AppCompatActivity() {
 
                 clearHistory.isVisible = true
                 historyText.isVisible = true
+                trackListAdapter.notifyDataSetChanged()
             }
         }
         trackListAdapter.notifyDataSetChanged()

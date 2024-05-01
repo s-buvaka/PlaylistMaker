@@ -14,7 +14,7 @@ import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
 class AudioViewModel(private val interactor: AudioPlayerInteractor) : ViewModel() {
 
     private var playerState: MediaPlayerState = MediaPlayerState.Default
-    private var currentState: MediaPlayerState? = null
+    private var currentState: MediaPlayerState? = MediaPlayerState.Default
     private var loadingLiveData = MutableLiveData(playerState)
 
     private val handler = Handler(Looper.getMainLooper())
@@ -33,7 +33,7 @@ class AudioViewModel(private val interactor: AudioPlayerInteractor) : ViewModel(
         }
     }
 
-    fun refreshTime() {
+    private fun refreshTime() {
         loadingLiveData.postValue(MediaPlayerState.Playing(interactor.updateTimer()))
     }
 

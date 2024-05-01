@@ -9,11 +9,9 @@ import com.marat.hvatit.playlistmaker2.data.TrackRepositoryImpl
 import com.marat.hvatit.playlistmaker2.data.dataSource.HistoryPref
 import com.marat.hvatit.playlistmaker2.data.dataSource.HistoryPrefImpl
 import com.marat.hvatit.playlistmaker2.data.dto.JsonParserImpl
-import com.marat.hvatit.playlistmaker2.data.network.IntentNavigatorImpl
 import com.marat.hvatit.playlistmaker2.data.network.RetrofitNetworkClient
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerCallback
 import com.marat.hvatit.playlistmaker2.domain.api.AudioPlayerInteractor
-import com.marat.hvatit.playlistmaker2.domain.api.IntentNavigator
 import com.marat.hvatit.playlistmaker2.domain.api.MainInteractor
 import com.marat.hvatit.playlistmaker2.domain.api.SettingsInteractor
 import com.marat.hvatit.playlistmaker2.domain.api.TrackInteractor
@@ -24,6 +22,8 @@ import com.marat.hvatit.playlistmaker2.domain.impl.SettingsInteractorImpl
 import com.marat.hvatit.playlistmaker2.domain.impl.TrackInteractorImpl
 import com.marat.hvatit.playlistmaker2.domain.models.SaveStack
 import com.marat.hvatit.playlistmaker2.domain.models.Track
+import com.marat.hvatit.playlistmaker2.presentation.settings.IntentNavigator
+import com.marat.hvatit.playlistmaker2.presentation.settings.IntentNavigatorImpl
 import com.marat.hvatit.playlistmaker2.presentation.utils.GlideHelper
 
 object Creator {

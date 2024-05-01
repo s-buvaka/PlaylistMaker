@@ -1,5 +1,6 @@
 package com.marat.hvatit.playlistmaker2.presentation.search
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ class SearchViewModel(
 
     init {
         saveSongStack.addAll(saveSongStack.getItemsFromCache()?.toList() ?: listOf())
+        Log.e("newSaveStack","${saveSongStack.getItemsFromCache()?.toList()}")
     }
 
     fun getLoadingLiveData(): LiveData<SearchState> = loadingLiveData
@@ -53,6 +55,9 @@ class SearchViewModel(
             this.saveSongStack.remove(item)
         }
         this.saveSongStack.pushElement(item)
+        if(loadingLiveData.value is SearchState.StartState){
+            setSavedTracks()
+        }
     }
 
     fun saveTracksToCache() {

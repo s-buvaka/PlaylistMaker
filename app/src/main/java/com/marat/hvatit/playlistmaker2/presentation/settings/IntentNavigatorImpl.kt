@@ -1,11 +1,9 @@
-package com.marat.hvatit.playlistmaker2.data.network
+package com.marat.hvatit.playlistmaker2.presentation.settings
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.marat.hvatit.playlistmaker2.R
-import com.marat.hvatit.playlistmaker2.domain.api.IntentNavigator
-import com.marat.hvatit.playlistmaker2.presentation.settings.ActionFilter
 
 class IntentNavigatorImpl(private val context: Context) : IntentNavigator {
     override fun createIntent(action: ActionFilter) {

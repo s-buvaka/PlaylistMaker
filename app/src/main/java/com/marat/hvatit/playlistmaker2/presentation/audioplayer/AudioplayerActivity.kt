@@ -99,15 +99,15 @@ class AudioplayerActivity : AppCompatActivity(),
         Log.e("$TAG", result.toString())
         setTextContent(result)
         buttonPlay.isEnabled = false
-
         viewModel.playbackControl()
+
         buttonPlay.setOnClickListener {
             viewModel.playbackControl()
         }
 
         viewModel.getLoadingLiveData().observe(this) { playerState ->
             runOnUiThread {
-                playbackControl(playerState)
+                uiControl(playerState)
             }
         }
 
@@ -136,7 +136,7 @@ class AudioplayerActivity : AppCompatActivity(),
         viewModel.destroyPlayer()
     }
 
-    private fun playbackControl(state: MediaPlayerState) {
+    private fun uiControl(state: MediaPlayerState) {
         //playerState = interactor.playbackControl()
         //viewModel.playbackControl()
         when (state) {
